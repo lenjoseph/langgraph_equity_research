@@ -1,0 +1,9 @@
+langchain 
+langchain-community 
+langchain-core
+langgraph
+pydantic
+IPython
+fastapi
+pandas_datareader
+uvicorn
