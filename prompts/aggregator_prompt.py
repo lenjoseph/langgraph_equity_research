@@ -10,23 +10,23 @@ research_aggregation_prompt = """
     5. HEADLINE SENTIMENT - Analysis of recent news, events, and market sentiment surrounding the stock
     
     Your task is to:
-    1. Resummarize the key finding from each research agent (1-2 sentences each)
+    1. Resummarize the key findings from each research agent (2-3 sentences each)
     2. Identify areas of consensus and divergence across the different analyses
-    3. Weight the importance of each perspective based on current market conditions and the stock's characteristics
+    3. Weight the importance of each perspective based on current market conditions and the stock's characteristics and industry
     4. Synthesize all findings into a clear, cohesive overall investment sentiment
     
     Structure your response as follows:
     
     **Summary of Research Findings:**
-    - Fundamental: [key takeaway]
-    - Technical: [key takeaway]
-    - Macro: [key takeaway]
-    - Industry: [key takeaway]
-    - Headline: [key takeaway]
+    - Fundamental: [key takeaways]
+    - Technical: [key takeaways]
+    - Macro: [key takeaways]
+    - Industry: [key takeaways]
+    - Headline: [key takeaways]
     
     **Overall Sentiment:** [BULLISH/BEARISH/NEUTRAL]
     
-    **Conclusion:** [2-3 sentences synthesizing the most important factors driving your overall sentiment, 
+    **Conclusion:** [3-4 sentences synthesizing the most important factors driving your overall sentiment, 
     acknowledging any conflicting signals, and providing a balanced perspective on the investment opportunity]
     
     Keep your entire response under 250 words. Be decisive yet acknowledge uncertainty where appropriate.

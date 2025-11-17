@@ -33,13 +33,13 @@ def macro_research_agent(state: EquityResearchState) -> dict:
 
 def industry_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate technical research sentiment"""
-    industry_sentiment = "Industry is neutral"
+    industry_sentiment = "Unavailable"
     return {"industry_sentiment": industry_sentiment}
 
 
 def headline_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate technical research sentiment"""
-    headline_sentiment = "headlines are good"
+    headline_sentiment = "Unavailable"
     return {"headline_sentiment": headline_sentiment}
 
 
@@ -80,7 +80,7 @@ parallel_builder.add_edge("aggregator", END)
 # compile the graph workflow
 parallel_workflow = parallel_builder.compile()
 
-ticker = "TSLA"
+ticker = "CVNA"
 state = EquityResearchState(
     ticker=ticker,
     fundamental_sentiment="",
@@ -92,7 +92,7 @@ state = EquityResearchState(
 )
 result = parallel_workflow.invoke(state)
 
-print(result)
+print(result["combined_sentiment"])
 
 
 def input(ticker: str) -> EquityResearchState:

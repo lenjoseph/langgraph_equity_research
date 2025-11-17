@@ -11,7 +11,7 @@ technical_research_prompt = """
     - Trends show whether price is above or below moving averages
     
     Based on this data, provide a concise technical sentiment analysis (bullish/bearish/neutral) 
-    for the stock with 2-3 key supporting points from the indicators. Keep it under 150 words.
+    for the stock with 4-5 key supporting points from the indicators. Keep it under 250 words.
     Be specific about which timeframes (mid-term vs macro-term) and indicators support your view.
     Only use the retrieved technical data to draw inferences.
     """
