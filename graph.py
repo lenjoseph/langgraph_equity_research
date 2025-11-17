@@ -4,11 +4,9 @@ from langgraph.graph import END, StateGraph, START
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
-import llm_models
+from agents.macro.agent import get_macro_sentiment
 
 load_dotenv()
-
-# llm = init_chat_model(llm_models.LLM_MODELS["OAI"])
 
 
 # graph state
@@ -37,7 +35,7 @@ def technical_research_agent(state: EquityResearchState) -> dict:
 
 def macro_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate fundamental research sentiment"""
-    macro_sentiment = "gewrgw"
+    macro_sentiment = get_macro_sentiment()
     return {"macro_sentiment": macro_sentiment}
 
 

@@ -1,9 +1,10 @@
+from langchain_core.tools import Tool
 import pandas_datareader as pdr
 from datetime import datetime, timedelta
 import pandas as pd
 import json
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class HistoricalDataPoint(BaseModel):
@@ -50,12 +51,15 @@ class MacroDataResponse(BaseModel):
     )
 
 
-def get_macro_data(period_days: int = 365) -> MacroDataResponse:
+class MacroDataInput(BaseModel):
+    """Input schema for the macro data tool. No parameters required."""
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+
+def get_macro_data() -> MacroDataResponse:
     """
     Retrieve the most recent macroeconomic data from FRED (Federal Reserve Economic Data).
-
-    Args:
-        period_days: Number of days of historical data to retrieve (default: 365)
 
     Returns:
         MacroDataResponse containing:
@@ -74,7 +78,7 @@ def get_macro_data(period_days: int = 365) -> MacroDataResponse:
         - Optional yoy_inflation_rate (CPI only)
     """
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=period_days)
+    start_date = end_date - timedelta(days=365)
 
     try:
         indicators = {
@@ -176,7 +180,6 @@ def get_macro_data(period_days: int = 365) -> MacroDataResponse:
                     )
             except:
                 pass
-
         return MacroDataResponse(
             timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             data=results,
@@ -190,45 +193,9 @@ def get_macro_data(period_days: int = 365) -> MacroDataResponse:
         )
 
 
-if __name__ == "__main__":
-    print("Fetching macroeconomic data from FRED...\n")
-
-    # Get macro data
-    response = get_macro_data(period_days=365)
-
-    # Pretty print the results
-    if response.error:
-        print(f"Error: {response.error}")
-    else:
-        print(f"Data retrieved at: {response.timestamp}\n")
-        print("=" * 80)
-
-        for indicator, info in response.data.items():
-            print(f"\n{indicator.replace('_', ' ').upper()}")
-            print("-" * 40)
-
-            if info.error:
-                print(f"  Error: {info.error}")
-            else:
-                print(f"  Latest Value: {info.latest_value:.2f}")
-                print(f"  Latest Date: {info.latest_date}")
-
-                # Display change metrics based on indicator type
-                if info.quarterly_change_pct_points is not None:
-                    change = info.quarterly_change_pct_points
-                    change_symbol = "↑" if change > 0 else "↓"
-                    print(f"  Quarterly Change: {change_symbol} {abs(change):.2f} ppt")
-                elif info.monthly_change_percent is not None:
-                    change = info.monthly_change_percent
-                    change_symbol = "↑" if change > 0 else "↓"
-                    print(f"  Monthly Change: {change_symbol} {abs(change):.2f}%")
-
-                if info.yoy_inflation_rate is not None:
-                    print(f"  Year-over-Year Rate: {info.yoy_inflation_rate:.2f}%")
-
-        print("\n" + "=" * 80)
-        print("\nFull data saved to 'macro_data.json'")
-
-        # Save to JSON file
-        with open("macro_data.json", "w") as f:
-            json.dump(response.model_dump(), f, indent=2)
+get_macro_data_tool = Tool(
+    name="get_macro_data_tool",
+    description="Use this tool to fetch macroeconomic data including GDP Growth Rate, Consumer Price Index (CPI/inflation), and Consumer Sentiment from FRED. Returns historical data and latest values with change calculations.",
+    func=get_macro_data,
+    args_schema=MacroDataInput,
+)
