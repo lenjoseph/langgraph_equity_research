@@ -1,7 +1,8 @@
+from typing import Any
 from langchain_openai import ChatOpenAI
 
 
-def run_agent_with_tools(model: str, prompt: str, tools: list):
+def run_agent_with_tools(llm: ChatOpenAI, prompt: str, tools: list):
     """
     Generic agent executor that handles tool calling flow.
 
@@ -16,7 +17,7 @@ def run_agent_with_tools(model: str, prompt: str, tools: list):
 
     tools_map = {tool.name: tool for tool in tools}
 
-    llm = ChatOpenAI(model=model).bind_tools(tools)
+    llm.bind_tools(tools)
 
     # initial invocation
     response = llm.invoke(prompt)

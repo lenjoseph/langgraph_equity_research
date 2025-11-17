@@ -1,4 +1,5 @@
 import dotenv
+from langchain_openai import ChatOpenAI
 
 from tools.get_macro import get_macro_data_tool
 from prompts.macro_prompt import macro_research_prompt
@@ -12,4 +13,5 @@ def get_macro_sentiment():
     prompt = macro_research_prompt
     tools = [get_macro_data_tool]
     model = LLM_MODELS["open_ai"]
-    return run_agent_with_tools(model, prompt, tools)
+    llm = ChatOpenAI(model=model)
+    return run_agent_with_tools(llm, prompt, tools)

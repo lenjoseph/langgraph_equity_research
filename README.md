@@ -8,7 +8,8 @@ This app implements an agentic ai architecture to compile equity research on a s
 The app exposes a POST endpoint that receives a single stock ticker which serves as the focal point of the research.
 The app structures ai agents as research domain specialists that perform data gathering and analysis scoped to their respective domain.
 The app manages state through langgraph's graph state model.
-When all agents have executed, a final agent synthesizes aggregate findings into a stock sentiment category; buy, hold, or sell.
+Research agents are executed in parallel at the start of the workflow.
+When all agents have executed, a aggregator agent synthesizes overall sentiment for the stock.
 
 # Architecture Components
 
@@ -28,4 +29,5 @@ Economic Data API: Pandas Datareader
 2. Fundamentals Researcher - Focuses on business fundamentals via most recent earnings results
 3. Macro Economic Researcher - Focuses on the macro economic components provided by federal reserve data
 4. Industry Researcher - Focuses on forecasted headwinds / tailwinds relative to the industry of the stock
-5. Sentiment Synthesizer - Compiles overall stock sentiment based on aggregate findings of research specialist agents
+5. Headline Researcher - Focuses on recent (within the last month) headlines about the stock
+6. Sentiment Aggregator - Compiles overall stock sentiment based on aggregate findings of research specialist agents

@@ -1,4 +1,5 @@
 import dotenv
+from langchain_openai import ChatOpenAI
 
 from tools.get_technicals import get_technical_analysis_tool
 from prompts.technicals_prompt import technical_research_prompt
@@ -12,4 +13,5 @@ def get_technical_sentiment(ticker: str):
     prompt = f"{technical_research_prompt}\n\nAnalyze the technical indicators for ticker: {ticker}"
     tools = [get_technical_analysis_tool]
     model = LLM_MODELS["open_ai"]
-    return run_agent_with_tools(model, prompt, tools)
+    llm = ChatOpenAI(model=model)
+    return run_agent_with_tools(llm, prompt, tools)

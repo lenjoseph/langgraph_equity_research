@@ -1,4 +1,5 @@
 import dotenv
+from langchain_openai import ChatOpenAI
 
 from models.state import EquityResearchState
 from prompts.aggregator_prompt import research_aggregation_prompt
@@ -12,4 +13,5 @@ def get_aggregated_sentiment(state: EquityResearchState):
     prompt = f"{research_aggregation_prompt}\n\nAggregate the following equity research: {state}"
     tools = []
     model = LLM_MODELS["open_ai"]
-    return run_agent_with_tools(model, prompt, tools)
+    llm = ChatOpenAI(model=model)
+    return run_agent_with_tools(llm, prompt, tools)

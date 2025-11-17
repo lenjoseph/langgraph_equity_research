@@ -77,6 +77,8 @@ filelock==3.20.0
     #   huggingface-hub
     #   torch
     #   transformers
+filetype==1.2.0
+    # via langchain-google-genai
 flatbuffers==25.9.23
     # via onnxruntime
 frozendict==2.4.7
@@ -89,16 +91,31 @@ fsspec==2025.10.0
     # via
     #   huggingface-hub
     #   torch
+google-ai-generativelanguage==0.9.0
+    # via langchain-google-genai
+google-api-core[grpc]==2.28.1
+    # via google-ai-generativelanguage
 google-auth==2.43.0
-    # via kubernetes
+    # via
+    #   google-ai-generativelanguage
+    #   google-api-core
+    #   kubernetes
 googleapis-common-protos==1.72.0
-    # via opentelemetry-exporter-otlp-proto-grpc
+    # via
+    #   google-api-core
+    #   grpcio-status
+    #   opentelemetry-exporter-otlp-proto-grpc
 greenlet==3.2.4
     # via sqlalchemy
 grpcio==1.76.0
     # via
     #   chromadb
+    #   google-ai-generativelanguage
+    #   google-api-core
+    #   grpcio-status
     #   opentelemetry-exporter-otlp-proto-grpc
+grpcio-status==1.76.0
+    # via google-api-core
 h11==0.16.0
     # via
     #   httpcore
@@ -169,12 +186,15 @@ langchain-core==1.0.5
     #   langchain
     #   langchain-classic
     #   langchain-community
+    #   langchain-google-genai
     #   langchain-huggingface
     #   langchain-openai
     #   langchain-text-splitters
     #   langgraph
     #   langgraph-checkpoint
     #   langgraph-prebuilt
+langchain-google-genai==3.0.3
+    # via -r requirements.in
 langchain-huggingface==1.0.1
     # via -r requirements.in
 langchain-openai==1.0.3
@@ -305,11 +325,19 @@ propcache==0.4.1
     # via
     #   aiohttp
     #   yarl
+proto-plus==1.26.1
+    # via
+    #   google-ai-generativelanguage
+    #   google-api-core
 protobuf==6.33.1
     # via
+    #   google-ai-generativelanguage
+    #   google-api-core
     #   googleapis-common-protos
+    #   grpcio-status
     #   onnxruntime
     #   opentelemetry-proto
+    #   proto-plus
     #   yfinance
 ptyprocess==0.7.0
     # via pexpect
@@ -333,6 +361,7 @@ pydantic==2.12.4
     #   langchain
     #   langchain-classic
     #   langchain-core
+    #   langchain-google-genai
     #   langgraph
     #   langsmith
     #   openai
@@ -383,6 +412,7 @@ regex==2025.11.3
     #   transformers
 requests==2.32.5
     # via
+    #   google-api-core
     #   huggingface-hub
     #   kubernetes
     #   langchain-classic
