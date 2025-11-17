@@ -3,6 +3,7 @@ from langchain_core.runnables import RunnableLambda
 from langgraph.graph import END, StateGraph, START
 from dotenv import load_dotenv
 
+from agents.headline_agent import get_headline_sentiment
 from models.state import EquityResearchState
 from agents.aggregator_agent import get_aggregated_sentiment
 from agents.fundamentals_agent import get_fundamental_sentiment
@@ -39,7 +40,7 @@ def industry_research_agent(state: EquityResearchState) -> dict:
 
 def headline_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate technical research sentiment"""
-    headline_sentiment = "Unavailable"
+    headline_sentiment = get_headline_sentiment(ticker=state.ticker)
     return {"headline_sentiment": headline_sentiment}
 
 
@@ -90,8 +91,20 @@ state = EquityResearchState(
     headline_sentiment="",
     combined_sentiment="",
 )
+
+
 result = parallel_workflow.invoke(state)
 
+print("=" * 80)
+print("MACRO SENTIMENT:")
+print("=" * 80)
+print(result.get("macro_sentiment", "NOT FOUND"))
+print("\n")
+print("=" * 80)
+print("HEADLINE SENTIMENT:")
+print("=" * 80)
+print(result.get("headline_sentiment", "NOT FOUND"))
+print("\n")
 print(result["combined_sentiment"])
 
 

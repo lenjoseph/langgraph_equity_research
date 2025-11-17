@@ -11,7 +11,6 @@ dotenv.load_dotenv()
 
 def get_aggregated_sentiment(state: EquityResearchState):
     prompt = f"{research_aggregation_prompt}\n\nAggregate the following equity research: {state}"
-    tools = []
     model = LLM_MODELS["open_ai"]
     llm = ChatOpenAI(model=model)
-    return run_agent_with_tools(llm, prompt, tools)
+    return run_agent_with_tools(llm, prompt)
