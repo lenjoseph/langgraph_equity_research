@@ -2,7 +2,6 @@ from langchain_core.tools import Tool
 import pandas_datareader as pdr
 from datetime import datetime, timedelta
 import pandas as pd
-import json
 from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict
 

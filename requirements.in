@@ -11,5 +11,6 @@ pydantic
 IPython
 fastapi
 pandas_datareader
+yfinance
 uvicorn
 numpy<2

@@ -4,7 +4,8 @@ from langgraph.graph import END, StateGraph, START
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
-from agents.macro.agent import get_macro_sentiment
+from agents.macro_agent import get_macro_sentiment
+from agents.technical_agent import get_technical_sentiment
 
 load_dotenv()
 
@@ -29,7 +30,7 @@ def fundamental_research_agent(state: EquityResearchState) -> dict:
 
 def technical_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate technical research sentiment"""
-    technical_sentiment = "gewrgw"
+    technical_sentiment = get_technical_sentiment(ticker=state.ticker)
     return {"technical_sentiment": technical_sentiment}
 
 

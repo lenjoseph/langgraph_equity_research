@@ -1,2 +1,0 @@
-"""Technicals agent package."""
-
