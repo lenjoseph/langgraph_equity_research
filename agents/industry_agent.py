@@ -2,7 +2,8 @@ import dotenv
 from datetime import datetime, timedelta
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from agents.agent_utils import run_agent_with_tools
+from models.agent_output import IndustryAnalysisOutput
+from agents.agent_utils import run_agent_with_tools, format_analysis_output
 from constants.llm_models import LLM_MODELS
 from prompts.industry_prompt import industry_research_prompt
 
@@ -32,4 +33,5 @@ def get_industry_sentiment(ticker: str, trade_duration_days: int):
         model=model, model_kwargs={"tools": [{"google_search_retrieval": {}}]}
     )
 
-    return run_agent_with_tools(llm, prompt)
+    result = run_agent_with_tools(llm, prompt, structured_output=IndustryAnalysisOutput)
+    return format_analysis_output(result)
