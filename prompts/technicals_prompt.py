@@ -13,14 +13,15 @@ technical_research_prompt = """
     - The response includes the actual periods used for each indicator (rsi_period, short_sma_period, long_sma_period, etc.)
     
     TRADE CONTEXT:
-    You will be provided with a trade duration in days. The indicators are automatically optimized for this duration:
-    - For a 7-day trade: Indicators use ~3-4 day short-term and ~24-28 day long-term lookbacks
-    - For a 30-day trade: Indicators use ~15 day short-term and ~105-120 day long-term lookbacks  
-    - For a 90-day trade: Indicators use ~45 day short-term and ~315-360 day long-term lookbacks
+    You will be provided with a trade duration type. The indicators are automatically optimized for this duration:
+    - Day Trade (1 day): Indicators use intraday and very short-term lookbacks, focus on momentum
+    - Swing Trade (7 days): Indicators use ~3-4 day short-term and ~24-28 day long-term lookbacks
+    - Position Trade (30 days): Indicators use ~15 day short-term and ~105-120 day long-term lookbacks
     
     Interpret the indicators in the context of the trade duration:
-    - Weight short-term indicators more heavily for shorter durations
-    - Weight long-term indicators more heavily for longer durations
+    - Day Trade: Weight short-term indicators and momentum heavily
+    - Swing Trade: Balance short and medium-term indicators
+    - Position Trade: Weight longer-term trends more heavily
     - Consider the calibrated periods provided in the response when discussing trends
     
     Based on this data, provide a concise technical sentiment analysis (bullish/bearish/neutral) 

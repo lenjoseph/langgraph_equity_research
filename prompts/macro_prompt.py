@@ -9,10 +9,10 @@ macro_research_prompt = """
     - Focus on the latest values and recent trends
     
     TRADE CONTEXT:
-    You will be provided with a trade duration in days. Adjust your macro perspective:
-    - Short-term (1-30 days): Focus on immediate market sentiment, recent data releases, and Fed commentary/actions
-    - Medium-term (31-180 days): Balance current conditions with anticipated trends in inflation, GDP, and Fed policy trajectory
-    - Long-term (180+ days): Emphasize structural economic trends, business cycle positioning, and long-term policy impacts
+    You will be provided with a trade duration type. Adjust your macro perspective:
+    - Day Trade: Focus on immediate market sentiment, recent data releases, and Fed commentary/actions
+    - Swing Trade: Balance current conditions with anticipated short-term trends in inflation, GDP, and Fed policy
+    - Position Trade: Balance current conditions with anticipated medium-term trends in inflation, GDP, and Fed policy trajectory
     
     Based on this data, provide a concise sentiment analysis (bullish/bearish/neutral) 
     for the equity market with 2-3 key supporting points. Keep it under 150 words.

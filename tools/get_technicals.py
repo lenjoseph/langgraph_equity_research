@@ -4,6 +4,8 @@ import pandas as pd
 from datetime import datetime
 
 from models.tools import TechnicalAnalysis, TechnicalAnalysisInput
+from models.api import TradeDuration
+from models.trade_duration_utils import trade_duration_to_days
 
 
 def calculate_sma(data: pd.Series, length: int) -> pd.Series:
@@ -181,19 +183,24 @@ def add_technical_indicators(data: pd.DataFrame, periods: dict):
     data["BB_Mid"] = bb["Middle"]
 
 
-def get_technical_analysis(ticker: str, trade_duration_days: int) -> TechnicalAnalysis:
+def get_technical_analysis(ticker: str, trade_duration: str) -> TechnicalAnalysis:
     """
     Performs technical analysis on a stock with indicators calibrated to the trade duration.
 
     Args:
         ticker (str): Stock ticker (e.g., 'AAPL').
-        trade_duration_days (int): Expected holding period in days. Indicators are calibrated
-                                   to this timeframe (e.g., 7 for weekly, 30 for monthly, 90 for quarterly).
+        trade_duration (str): Trade duration type ('day_trade', 'swing_trade', or 'position_trade').
 
     Returns:
         TechnicalAnalysis: Structured output with indicators, signals, and sentiment.
     """
     try:
+        # Convert string to enum
+        trade_duration_enum = TradeDuration(trade_duration)
+
+        # Convert trade duration enum to days
+        trade_duration_days = trade_duration_to_days(trade_duration_enum)
+
         # Calculate appropriate indicator periods based on trade duration
         periods = calculate_indicator_periods(trade_duration_days)
 
@@ -283,7 +290,7 @@ def get_technical_analysis(ticker: str, trade_duration_days: int) -> TechnicalAn
 
 get_technical_analysis_tool = Tool(
     name="get_technical_analysis_tool",
-    description="Use this tool to perform technical analysis on a stock with indicators calibrated to your specific trade duration. Provide the ticker and expected holding period in days (e.g., 7 for weekly, 30 for monthly, 90 for quarterly trades). The tool automatically adjusts RSI, Moving Averages, MACD, Stochastic Oscillator, and Bollinger Bands periods to match your timeframe. Returns structured data with buy/sell signals and overall sentiment tailored to your trade horizon.",
+    description="Use this tool to perform technical analysis on a stock with indicators calibrated to your specific trade duration. Provide the ticker and trade_duration (must be one of: 'day_trade', 'swing_trade', or 'position_trade'). The tool automatically adjusts RSI, Moving Averages, MACD, Stochastic Oscillator, and Bollinger Bands periods to match your timeframe. Returns structured data with buy/sell signals and overall sentiment tailored to your trade horizon.",
     func=get_technical_analysis,
     args_schema=TechnicalAnalysisInput,
 )

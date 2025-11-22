@@ -1,11 +1,12 @@
 from pydantic import BaseModel
+from models.api import TradeDuration
 
 
 class EquityResearchState(BaseModel):
     """State model for the equity research workflow."""
 
     ticker: str
-    trade_duration_days: int
+    trade_duration: TradeDuration
     fundamental_sentiment: str
     technical_sentiment: str
     macro_sentiment: str

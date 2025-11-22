@@ -17,7 +17,7 @@ load_dotenv()
 def fundamental_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate fundamental research sentiment"""
     fundamental_sentiment = get_fundamental_sentiment(
-        ticker=state.ticker, trade_duration_days=state.trade_duration_days
+        ticker=state.ticker, trade_duration=state.trade_duration
     )
     return {"fundamental_sentiment": fundamental_sentiment}
 
@@ -25,21 +25,21 @@ def fundamental_research_agent(state: EquityResearchState) -> dict:
 def technical_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate technical research sentiment"""
     technical_sentiment = get_technical_sentiment(
-        ticker=state.ticker, trade_duration_days=state.trade_duration_days
+        ticker=state.ticker, trade_duration=state.trade_duration
     )
     return {"technical_sentiment": technical_sentiment}
 
 
 def macro_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate macro research sentiment"""
-    macro_sentiment = get_macro_sentiment(trade_duration_days=state.trade_duration_days)
+    macro_sentiment = get_macro_sentiment(trade_duration=state.trade_duration)
     return {"macro_sentiment": macro_sentiment}
 
 
 def industry_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate technical research sentiment"""
     industry_sentiment = get_industry_sentiment(
-        ticker=state.ticker, trade_duration_days=state.trade_duration_days
+        ticker=state.ticker, trade_duration=state.trade_duration
     )
     return {"industry_sentiment": industry_sentiment}
 
@@ -47,7 +47,7 @@ def industry_research_agent(state: EquityResearchState) -> dict:
 def headline_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate technical research sentiment"""
     headline_sentiment = get_headline_sentiment(
-        ticker=state.ticker, trade_duration_days=state.trade_duration_days
+        ticker=state.ticker, trade_duration=state.trade_duration
     )
     return {"headline_sentiment": headline_sentiment}
 
@@ -100,7 +100,7 @@ parallel_workflow = parallel_builder.compile()
 def input(input_dict: dict) -> EquityResearchState:
     state = EquityResearchState(
         ticker=input_dict["ticker"],
-        trade_duration_days=input_dict["trade_duration_days"],
+        trade_duration=input_dict["trade_duration"],
         fundamental_sentiment="",
         technical_sentiment="",
         macro_sentiment="",

@@ -122,9 +122,9 @@ class TechnicalAnalysisInput(BaseModel):
     """Input schema for technical analysis tool."""
 
     ticker: str = Field(..., description="Stock ticker (e.g., 'AAPL', 'MSFT')")
-    trade_duration_days: int = Field(
+    trade_duration: str = Field(
         ...,
-        description="Expected trade duration in days. Technical indicators will be calibrated to this timeframe (e.g., 7 for weekly trades, 30 for monthly, 90 for quarterly)",
+        description="Trade duration type. Must be one of: 'day_trade' (intraday), 'swing_trade' (7 days), or 'position_trade' (30 days)",
     )
 
 
@@ -177,3 +177,20 @@ class MacroDataInput(BaseModel):
     """Input schema for the macro data tool. No parameters required."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+
+# Options Data Models
+class OptionsDataInput(BaseModel):
+    """Input schema for options analysis tool."""
+
+    ticker_symbol: str = Field(
+        ..., description="Stock ticker symbol (e.g., 'AAPL', 'MSFT')"
+    )
+    trade_duration: str = Field(
+        ...,
+        description="Trade duration type. Must be one of: 'day_trade', 'swing_trade', or 'position_trade'. The tool will select the most relevant expiration date based on this timeframe.",
+    )
+    min_oi: int = Field(
+        100,
+        description="Minimum open interest threshold to filter out illiquid contracts",
+    )

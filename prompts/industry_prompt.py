@@ -14,10 +14,10 @@ industry_research_prompt = """
     - IGNORE any analysis or data older than {cutoff_date}
     
     TRADE CONTEXT:
-    Trade Duration: {trade_duration_days} days
-    - Short-term (1-30 days): Focus on immediate sector catalysts, near-term competitive moves, and short-term supply/demand dynamics
-    - Medium-term (31-180 days): Balance current trends with emerging sector shifts and competitive repositioning
-    - Long-term (180+ days): Emphasize structural industry transformation, long-term competitive advantages, and secular trends
+    Trade Duration: {trade_duration}
+    - Day Trade: Focus on immediate sector catalysts, near-term competitive moves, and short-term supply/demand dynamics
+    - Swing Trade: Balance current trends with emerging sector shifts and short-term competitive movements
+    - Position Trade: Balance current trends with emerging sector shifts and competitive repositioning
     
     Your analysis should cover THREE key areas:
     

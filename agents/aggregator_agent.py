@@ -20,7 +20,10 @@ def get_aggregated_sentiment(state: EquityResearchState):
 
     # Convert structured output to string format
     if isinstance(result, AggregatedSentimentOutput):
-        formatted_output = f"**Trade Duration:** {state.trade_duration_days} days - {result.trade_duration_category}\n\n"
+        from models.trade_duration_utils import trade_duration_to_label
+
+        trade_duration_label = trade_duration_to_label(state.trade_duration)
+        formatted_output = f"**Trade Duration:** {trade_duration_label} - {result.trade_duration_category}\n\n"
         formatted_output += "**Summary of Research Findings:**\n"
         formatted_output += f"- Fundamental: {result.research_summaries.fundamental}\n"
         formatted_output += f"- Technical: {result.research_summaries.technical}\n"
