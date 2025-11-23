@@ -1,5 +1,7 @@
 from langchain_core.runnables import RunnableLambda
 from langgraph.graph import END, StateGraph, START
+from langgraph.cache.memory import InMemoryCache
+from langgraph.types import CachePolicy
 from dotenv import load_dotenv
 
 from agents.headline_agent import get_headline_sentiment
@@ -32,7 +34,7 @@ def technical_research_agent(state: EquityResearchState) -> dict:
 
 def macro_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate macro research sentiment"""
-    macro_sentiment = get_macro_sentiment(trade_duration=state.trade_duration)
+    macro_sentiment = get_macro_sentiment()
     return {"macro_sentiment": macro_sentiment}
 
 
@@ -58,16 +60,71 @@ def sentiment_aggregator(state: EquityResearchState) -> dict:
     return {"combined_sentiment": combined_sentiment}
 
 
+# configure graph cache
+cache = InMemoryCache()
+
+# evict fundamentals cache after one day
+# todo: get smart about dynamic cache eviction; set ttl based on last earnings release for ticker
+fundamental_research_cache_policy = CachePolicy(
+    key_func=lambda x: f"{x.ticker}_{x.trade_duration}".encode(), ttl=86400
+)
+
+# evict technical research cache after 5 minutes
+technical_research_cache_policy = CachePolicy(
+    key_func=lambda x: f"{x.ticker}_{x.trade_duration}".encode(), ttl=300
+)
+
+# evict macro research cache after one day
+# todo: get smart about dynamic cache eviction; set ttl based on last fed report issuance
+# static key since macro conditions are universal (don't depend on ticker or trade_duration)
+macro_research_cache_policy = CachePolicy(
+    key_func=lambda x: b"macro_research", ttl=86400
+)
+
+# evict industry research cache after one day
+industry_research_cache_policy = CachePolicy(
+    key_func=lambda x: f"{x.ticker}_{x.trade_duration}".encode(), ttl=86400
+)
+
+# evict headline research cache after one hour
+headline_research_cache_policy = CachePolicy(
+    key_func=lambda x: f"{x.ticker}_{x.trade_duration}".encode(), ttl=3600
+)
+
+
 # build workflow
 parallel_builder = StateGraph(EquityResearchState)
 
 # add agent nodes
-parallel_builder.add_node("fundamental_research_agent", fundamental_research_agent)
-parallel_builder.add_node("technical_research_agent", technical_research_agent)
-parallel_builder.add_node("macro_research_agent", macro_research_agent)
-parallel_builder.add_node("industry_research_agent", industry_research_agent)
-parallel_builder.add_node("headline_research_agent", headline_research_agent)
-parallel_builder.add_node("aggregator", sentiment_aggregator)
+parallel_builder.add_node(
+    "fundamental_research_agent",
+    fundamental_research_agent,
+    cache_policy=fundamental_research_cache_policy,
+)
+parallel_builder.add_node(
+    "technical_research_agent",
+    technical_research_agent,
+    cache_policy=technical_research_cache_policy,
+)
+parallel_builder.add_node(
+    "macro_research_agent",
+    macro_research_agent,
+    cache_policy=macro_research_cache_policy,
+)
+parallel_builder.add_node(
+    "industry_research_agent",
+    industry_research_agent,
+    cache_policy=industry_research_cache_policy,
+)
+parallel_builder.add_node(
+    "headline_research_agent",
+    headline_research_agent,
+    cache_policy=headline_research_cache_policy,
+)
+parallel_builder.add_node(
+    "aggregator",
+    sentiment_aggregator,
+)
 
 # call research agents in parallel
 parallel_builder.add_edge(START, "fundamental_research_agent")
@@ -87,7 +144,7 @@ parallel_builder.add_edge("headline_research_agent", "aggregator")
 parallel_builder.add_edge("aggregator", END)
 
 # compile the graph workflow
-parallel_workflow = parallel_builder.compile()
+parallel_workflow = parallel_builder.compile(cache=cache)
 
 # uncomment to regenerate architectural diagram
 
