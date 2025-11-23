@@ -64,26 +64,6 @@ def sentiment_aggregator(state: EquityResearchState) -> dict:
 cache = InMemoryCache()
 
 
-# evict fundamentals cache after one day
-# todo: get smart about dynamic cache eviction; set ttl based on last earnings release for ticker
-fundamental_research_cache_policy = create_cache_policy(ttl=86400)
-
-# evict technical research cache after 5 minutes
-technical_research_cache_policy = create_cache_policy(ttl=300)
-
-# evict macro research cache after one day
-# todo: get smart about dynamic cache eviction; set ttl based on last fed report issuance
-macro_research_cache_policy = create_cache_policy(
-    ttl=86400, static_key="macro_research"
-)
-
-# evict industry research cache after one day
-industry_research_cache_policy = create_cache_policy(ttl=86400)
-
-# evict headline research cache after one hour
-headline_research_cache_policy = create_cache_policy(ttl=3600)
-
-
 # build workflow
 parallel_builder = StateGraph(EquityResearchState)
 
@@ -91,27 +71,35 @@ parallel_builder = StateGraph(EquityResearchState)
 parallel_builder.add_node(
     "fundamental_research_agent",
     fundamental_research_agent,
-    cache_policy=fundamental_research_cache_policy,
+    # evict fundamentals cache after one day
+    # todo: get smart about dynamic cache eviction; set ttl based on last earnings release for ticker
+    cache_policy=create_cache_policy(ttl=86400),
 )
 parallel_builder.add_node(
     "technical_research_agent",
     technical_research_agent,
-    cache_policy=technical_research_cache_policy,
+    # evict technical research cache after 5 minutes
+    cache_policy=create_cache_policy(ttl=300),
 )
 parallel_builder.add_node(
     "macro_research_agent",
     macro_research_agent,
-    cache_policy=macro_research_cache_policy,
+    # evict macro research cache after one day
+    # todo: get smart about dynamic cache eviction; set ttl based on last fed report issuance
+    cache_policy=create_cache_policy(ttl=86400, static_key="macro_research"),
 )
 parallel_builder.add_node(
     "industry_research_agent",
     industry_research_agent,
-    cache_policy=industry_research_cache_policy,
+    # evict industry research cache after one day
+    cache_policy=create_cache_policy(ttl=86400),
 )
+
 parallel_builder.add_node(
     "headline_research_agent",
     headline_research_agent,
-    cache_policy=headline_research_cache_policy,
+    # evict headline research cache after one hour
+    cache_policy=create_cache_policy(ttl=3600),
 )
 parallel_builder.add_node(
     "aggregator",
