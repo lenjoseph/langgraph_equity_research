@@ -1,6 +1,9 @@
 from typing import Union
 from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
+from shared.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def run_agent_with_tools(
@@ -61,8 +64,5 @@ def run_agent_with_tools(
             # No tool call, return the response
             return response.content
     except Exception as e:
-        print(f"ERROR in run_agent_with_tools: {e}")
-        import traceback
-
-        traceback.print_exc()
+        logger.error(f"Error in run_agent_with_tools: {e}", exc_info=True)
         return f"Error executing agent: {str(e)}"
