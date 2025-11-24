@@ -1,37 +1,12 @@
-from typing import Union, Optional, Type
+from typing import Union
 from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
-from pydantic import BaseModel
-
-
-def format_analysis_output(result) -> str:
-    """
-    Format structured analysis output (with sentiment, key_points, confidence) to string.
-
-    Args:
-        result: The structured output object or string
-
-    Returns:
-        Formatted string output or original result if not structured
-    """
-    if (
-        hasattr(result, "sentiment")
-        and hasattr(result, "key_points")
-        and hasattr(result, "confidence")
-    ):
-        formatted_output = f"{result.sentiment.upper()}\n\n"
-        for point in result.key_points:
-            formatted_output += f"• {point}\n"
-        formatted_output += f"\nConfidence: {result.confidence}"
-        return formatted_output
-    return result
 
 
 def run_agent_with_tools(
     llm: Union[ChatOpenAI, ChatGoogleGenerativeAI],
     prompt: str,
     tools: list = [],
-    structured_output: Optional[Type[BaseModel]] = None,
 ):
     """
     Generic agent executor that handles tool calling flow.
@@ -40,11 +15,9 @@ def run_agent_with_tools(
         llm: The llm model to use for the agent
         prompt: The prompt to send to the LLM
         tools: List of tools to bind to the LLM
-        structured_output: Optional Pydantic model for structured output
 
     Returns:
-        The final LLM response content after executing any tool calls,
-        or a structured output object if structured_output is provided
+        The final LLM response content after executing any tool calls
     """
     try:
         tools_map = {tool.name: tool for tool in tools}
@@ -82,26 +55,11 @@ def run_agent_with_tools(
             ]
 
             # Second LLM call with tool results to get the analysis
-            # Apply structured output if requested
-            if structured_output:
-                llm_with_structured = llm_with_tools.with_structured_output(
-                    structured_output
-                )
-                final_response = llm_with_structured.invoke(messages)
-                return final_response
-            else:
-                final_response = llm_with_tools.invoke(messages)
-                return final_response.content
+            final_response = llm_with_tools.invoke(messages)
+            return final_response.content
         else:
             # No tool call, return the response
-            if structured_output:
-                llm_with_structured = llm_with_tools.with_structured_output(
-                    structured_output
-                )
-                structured_response = llm_with_structured.invoke(prompt)
-                return structured_response
-            else:
-                return response.content
+            return response.content
     except Exception as e:
         print(f"ERROR in run_agent_with_tools: {e}")
         import traceback

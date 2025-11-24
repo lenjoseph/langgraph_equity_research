@@ -22,4 +22,14 @@ fundamentals_research_prompt = """
     for the stock with 2-3 key supporting points from the financial metrics. Keep it under 150 words.
     Be specific about which ratios, growth metrics, or financial health indicators support your view for the given trade duration.
     Only use the retrieved fundamental data to draw inferences.
+    
+    Return your response in the following Markdown format:
+
+    [UNDERVALUED/OVERVALUED/FAIRLY VALUED]
+
+    *   [Key Point 1]
+    *   [Key Point 2]
+    *   [Key Point 3]
+
+    Confidence: [High/Medium/Low]
     """

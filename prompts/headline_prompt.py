@@ -25,4 +25,14 @@ headline_research_prompt = """
     for the stock with 2-3 key supporting points derived from the news. Keep it under 150 words.
     Be specific about which news events or themes are driving your sentiment assessment for the given trade duration.
     Only use the retrieved headline data to draw inferences.
+    
+    Return your response in the following Markdown format:
+
+    [BULLISH/BEARISH/NEUTRAL]
+
+    *   [Key Point 1]
+    *   [Key Point 2]
+    *   [Key Point 3]
+
+    Confidence: [High/Medium/Low]
     """

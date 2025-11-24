@@ -2,10 +2,9 @@ import dotenv
 from datetime import datetime, timedelta
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from models.agent_output import HeadlineAnalysisOutput
 from models.api import TradeDuration
 from models.trade_duration_utils import trade_duration_to_label
-from agents.agent_utils import run_agent_with_tools, format_analysis_output
+from agents.agent_utils import run_agent_with_tools
 from prompts.headline_prompt import headline_research_prompt
 from constants.llm_models import LLM_MODELS
 
@@ -36,5 +35,5 @@ def get_headline_sentiment(ticker: str, trade_duration: TradeDuration):
         model=model, model_kwargs={"tools": [{"google_search_retrieval": {}}]}
     )
 
-    result = run_agent_with_tools(llm, prompt, structured_output=HeadlineAnalysisOutput)
-    return format_analysis_output(result)
+    result = run_agent_with_tools(llm, prompt)
+    return result
