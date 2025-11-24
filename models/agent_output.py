@@ -17,22 +17,6 @@ class FundamentalAnalysisOutput(BaseModel):
     )
 
 
-class MacroAnalysisOutput(BaseModel):
-    """Structured output model for macro analysis."""
-
-    sentiment: str = Field(
-        description="Overall macro sentiment: 'favorable', 'unfavorable', or 'neutral'"
-    )
-    key_points: list[str] = Field(
-        description="Exactly 3 key supporting points from macro indicators. You must provide exactly 3 points.",
-        min_length=3,
-        max_length=3,
-    )
-    confidence: str = Field(
-        description="Confidence level in the analysis: 'high', 'medium', or 'low'"
-    )
-
-
 class IndustryAnalysisOutput(BaseModel):
     """Structured output model for industry analysis."""
 

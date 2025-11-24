@@ -13,4 +13,14 @@ macro_research_prompt = """
     Be precise about time periods (quarters for GDP, months for CPI and sentiment).
     Focus on current macro conditions and recent trends in inflation, GDP growth, and monetary policy.
     Only use the retrieved data to draw inferences.
+
+    Return your response in the following Markdown format:
+
+    [BULLISH/BEARISH/NEUTRAL]
+
+    *   [Key Point 1]
+    *   [Key Point 2]
+    *   [Key Point 3]
+
+    Confidence: [High/Medium/Low]
     """
