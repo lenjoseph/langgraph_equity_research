@@ -79,30 +79,3 @@ class HeadlineAnalysisOutput(BaseModel):
     confidence: str = Field(
         description="Confidence level in the analysis: 'high', 'medium', or 'low'"
     )
-
-
-class ResearchSummaries(BaseModel):
-    """Nested model for research summaries."""
-
-    fundamental: str = Field(description="Summary of fundamental analysis takeaways")
-    technical: str = Field(description="Summary of technical analysis takeaways")
-    macro: str = Field(description="Summary of macro analysis takeaways")
-    industry: str = Field(description="Summary of industry analysis takeaways")
-    headline: str = Field(description="Summary of headline analysis takeaways")
-
-
-class AggregatedSentimentOutput(BaseModel):
-    """Structured output model for aggregated sentiment analysis."""
-
-    trade_duration_category: str = Field(
-        description="Trade duration category: 'Short-term', 'Medium-term', or 'Long-term'"
-    )
-    research_summaries: ResearchSummaries = Field(
-        description="Summaries of each research agent's findings"
-    )
-    overall_sentiment: str = Field(
-        description="Overall investment sentiment: 'BULLISH', 'BEARISH', or 'NEUTRAL'"
-    )
-    conclusion: str = Field(
-        description="3-4 sentence conclusion synthesizing the most important factors"
-    )

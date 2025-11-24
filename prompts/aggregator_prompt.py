@@ -10,7 +10,7 @@ research_aggregation_prompt = """
     5. HEADLINE SENTIMENT - Analysis of recent news, events, and market sentiment surrounding the stock
     
     TRADE CONTEXT:
-    You will receive a trade duration in days. Weight your synthesis based on the timeframe:
+    You will receive a trade duration. Weight your synthesis based on the timeframe:
     - Short-term (1-30 days): Prioritize technical signals, headline sentiment, and immediate fundamental catalysts
     - Medium-term (31-180 days): Balance technical and fundamental factors, with attention to industry trends
     - Long-term (180+ days): Emphasize fundamental strength, industry positioning, and structural macro trends
@@ -21,7 +21,7 @@ research_aggregation_prompt = """
     3. Weight the importance of each perspective based on the trade duration, current market conditions, and the stock's characteristics and industry
     4. Synthesize all findings into a clear, cohesive overall investment sentiment appropriate for the specified trade duration
     
-    Structure your response as follows:
+    Format your response in Markdown as follows (do not use JSON):
     
     **Trade Duration:** [X days] - [Short-term/Medium-term/Long-term]
     
