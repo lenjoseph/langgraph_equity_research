@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 
 from agents.headline_agent import get_headline_sentiment
 from agents.industry_agent import get_industry_sentiment
+from aggregation.agent import get_aggregated_sentiment
 from models.state import EquityResearchState
-from agents.aggregator_agent import get_aggregated_sentiment
 from agents.fundamentals_agent import get_fundamental_sentiment
-from agents.macro_agent import get_macro_sentiment
+from macro.agent import get_macro_sentiment
 from agents.technical_agent import get_technical_sentiment
 from util import create_cache_policy
 

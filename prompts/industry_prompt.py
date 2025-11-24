@@ -13,6 +13,8 @@ industry_research_prompt = """
     - Look for patterns and themes across the sources covering trends, competition, and industry dynamics
     - IGNORE any analysis or data older than {cutoff_date}
     
+    You MUST use the google_search_retrieval tool to get this data. Do not make it up.
+    
     TRADE CONTEXT:
     Trade Duration: {trade_duration}
     - Day Trade: Focus on immediate sector catalysts, near-term competitive moves, and short-term supply/demand dynamics

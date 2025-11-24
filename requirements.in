@@ -4,6 +4,7 @@ langchain-core
 langchain-huggingface
 langchain-google-genai
 langchain-openai
+langgraph-cli[inmem]
 langgraph
 chromadb
 sentence-transformers

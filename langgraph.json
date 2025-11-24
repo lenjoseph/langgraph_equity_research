@@ -1,7 +1,7 @@
 {
-  "dependencies": ["langchain_openai", "./your_package"],
+  "dependencies": ["./"],
   "graphs": {
-    "equity_research": "./your_package/your_file.py:agent"
+    "equity_research": "./graph.py:parallel_workflow"
   },
-  "env": "./.env"
+  "env": ".env"
 }
