@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from agents.headline.prompt import headline_research_prompt
-from agents.shared.agent_utils import run_agent_with_tools
 from agents.shared.llm_models import LLM_MODELS
 
 
@@ -28,8 +27,10 @@ def get_headline_sentiment(ticker: str):
 
     # Configure Google Search grounding via model_kwargs
     llm = ChatGoogleGenerativeAI(
-        model=model, model_kwargs={"tools": [{"google_search_retrieval": {}}]}
+        model=model,
+        temperature=0.0,
+        model_kwargs={"tools": [{"google_search_retrieval": {}}]},
     )
 
-    result = run_agent_with_tools(llm, prompt)
-    return result
+    result = llm.invoke(prompt)
+    return result.content

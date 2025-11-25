@@ -13,6 +13,6 @@ def get_fundamental_sentiment(ticker: str):
     prompt = f"{fundamentals_research_prompt}\n\nAnalyze the business fundamentals for ticker: {ticker}"
     tools = [get_fundamentals_tool]
     model = LLM_MODELS["open_ai_smart"]
-    llm = ChatOpenAI(model=model)
+    llm = ChatOpenAI(model=model, temperature=0.0)
     result = run_agent_with_tools(llm, prompt, tools)
     return result

@@ -23,7 +23,7 @@ def get_aggregated_sentiment(state: EquityResearchState):
     prompt += f"Headline Analysis:\n{state.headline_sentiment}\n\n"
 
     model = LLM_MODELS["open_ai_smart"]
-    llm = ChatOpenAI(model=model)
+    llm = ChatOpenAI(model=model, temperature=0.2)
     result = run_agent_with_tools(llm, prompt)
 
     return result
