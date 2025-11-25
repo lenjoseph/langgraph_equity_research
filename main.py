@@ -23,15 +23,15 @@ def ping():
 async def research_equity(req: EquityResearchRequest):
     res = research_chain.invoke({"ticker": req.ticker})
     return {
-        "ticker": res["ticker"],
+        "ticker": res.ticker,
         "sentiment_analysis": {
-            "fundamental": res["fundamental_sentiment"],
-            "technical": res["technical_sentiment"],
-            "macro": res["macro_sentiment"],
-            "industry": res["industry_sentiment"],
-            "headline": res["headline_sentiment"],
+            "fundamental": res.fundamental_sentiment,
+            "technical": res.technical_sentiment,
+            "macro": res.macro_sentiment,
+            "industry": res.industry_sentiment,
+            "headline": res.headline_sentiment,
         },
-        "combined_sentiment": res["combined_sentiment"],
+        "combined_sentiment": res.combined_sentiment,
     }
 
 

@@ -183,7 +183,10 @@ def input(input_dict: dict) -> EquityResearchState:
     return state
 
 
-def output(state: EquityResearchState) -> EquityResearchState:
+def output(state: dict | EquityResearchState) -> EquityResearchState:
+    if isinstance(state, dict):
+        state = EquityResearchState(**state)
+
     if not state.is_ticker_valid:
         raise HTTPException(status_code=400, detail=f"Ticker {state.ticker} is invalid")
     return state
