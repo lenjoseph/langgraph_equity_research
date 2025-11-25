@@ -1,4 +1,7 @@
 from langgraph.types import CachePolicy
+import yfinance as yf
+
+from models.state import EquityResearchState
 
 
 def create_cache_policy(ttl: int, static_key: str | None = None) -> CachePolicy:
@@ -25,3 +28,16 @@ def create_cache_policy(ttl: int, static_key: str | None = None) -> CachePolicy:
         return f"{x.ticker}".encode()
 
     return CachePolicy(key_func=key_func, ttl=ttl)
+
+
+def validate_ticker(ticker: str, state: EquityResearchState) -> bool:
+    try:
+        ticker = yf.Ticker(state.ticker)
+        # Check if ticker has valid info by attempting to access basic info
+        info = ticker.info
+        # A valid ticker should have at least some basic info like symbol or regularMarketPrice
+        is_ticker = bool("longName" in info and info["longName"] is not None)
+
+        return {"is_ticker_valid": is_ticker}
+    except:
+        return {"is_ticker_valid": False}

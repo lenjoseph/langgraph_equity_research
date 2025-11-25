@@ -2,7 +2,7 @@ from langchain_core.runnables import RunnableLambda
 from langgraph.graph import END, StateGraph, START
 from langgraph.cache.memory import InMemoryCache
 from dotenv import load_dotenv
-import yfinance as yf
+
 
 from agents.headline.agent import get_headline_sentiment
 from agents.industry.agent import get_industry_sentiment
@@ -11,7 +11,7 @@ from models.state import EquityResearchState
 from agents.fundamentals.agent import get_fundamental_sentiment
 from agents.macro.agent import get_macro_sentiment
 from agents.technical.agent import get_technical_sentiment
-from util import create_cache_policy
+from util import create_cache_policy, validate_ticker
 
 load_dotenv()
 
@@ -19,17 +19,7 @@ load_dotenv()
 # graph nodes
 def ticker_validation(state: EquityResearchState) -> dict:
     """Validation node to ensure we have a real ticker"""
-
-    try:
-        ticker = yf.Ticker(state.ticker)
-        # Check if ticker has valid info by attempting to access basic info
-        info = ticker.info
-        # A valid ticker should have at least some basic info like symbol or regularMarketPrice
-        is_ticker = bool("longName" in info and info["longName"] is not None)
-
-        return {"is_ticker_valid": is_ticker}
-    except:
-        return {"is_ticker_valid": False}
+    return validate_ticker(ticker=state.ticker, state=state)
 
 
 def ticker_router(state: EquityResearchState):
