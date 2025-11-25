@@ -1,3 +1,9 @@
+import os
+
+# Suppress gRPC/absl logging before importing anything that uses it
+os.environ["GRPC_VERBOSITY"] = "ERROR"
+os.environ["GLOG_minloglevel"] = "2"
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from graph import research_chain
