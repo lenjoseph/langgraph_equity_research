@@ -12,3 +12,4 @@ class EquityResearchState(BaseModel):
     industry_sentiment: Optional[str] = None
     headline_sentiment: Optional[str] = None
     combined_sentiment: Optional[str] = None
+    is_ticker_valid: bool = False
