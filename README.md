@@ -45,6 +45,7 @@ The graph implements a node-based cache that configures cache keys and ttl at th
 The entrypoint of the graph vaidates that the ticker is valid using yfinance.
 Once the ticker is vaidated, research agents are executed in parallel.
 When all agents have executed, a aggregator agent synthesizes overall sentiment for the stock.
+An evaluator agent reviews the aggregator's output and determines whether it complies with criteria. If not, it provides feedback for revision.
 
 # Architecture Components
 
@@ -65,3 +66,4 @@ When all agents have executed, a aggregator agent synthesizes overall sentiment 
 4. Industry Researcher - Focuses on forecasted headwinds / tailwinds relative to the industry of the stock
 5. Headline Researcher - Focuses on recent (within the last month) headlines about the stock
 6. Sentiment Aggregator - Compiles overall stock sentiment based on aggregate findings of research specialist agents
+7. Sentiment Evaluator - Evaluates the aggregated sentiment for compliance with target criteria
