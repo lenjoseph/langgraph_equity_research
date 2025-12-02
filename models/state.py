@@ -23,4 +23,4 @@ class EquityResearchState(BaseModel):
     compliant: bool = False
     feedback: Optional[str] = None
     is_ticker_valid: bool = False
-    aggregation_retry_count: int = 0
+    revision_iteration_count: int = 0

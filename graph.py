@@ -105,15 +105,17 @@ def sentiment_evaluator(state: EquityResearchState) -> dict:
         sentiment=state.combined_sentiment
     )
     logger.info("Completed sentiment evaluation")
-    sentiment_evaluation["aggregation_retry_count"] = state.aggregation_retry_count + 1
+    sentiment_evaluation["revision_iteration_count"] = (
+        state.revision_iteration_count + 1
+    )
     return sentiment_evaluation
 
 
-def route_sentiment(state: EquityResearchState):
+def sentiment_router(state: EquityResearchState):
     "Route back to aggregator or terminate based on evaluator feedback"
     if state.compliant == True:
         return "Compliant"
-    elif state.aggregation_retry_count > 2:
+    elif state.revision_iteration_count > 2:
         return "Compliant"
     else:
         return "Noncompliant"
@@ -170,7 +172,6 @@ graph_builder.add_node(
 graph_builder.add_node("evaluator", sentiment_evaluator)
 
 # call research agents in parallel when ticker validation passes, otherwise end
-
 graph_builder.add_edge(START, "ticker_validation")
 graph_builder.add_conditional_edges(
     "ticker_validation",
@@ -184,7 +185,6 @@ graph_builder.add_conditional_edges(
         END,
     ],
 )
-
 # synthesize sentiment
 graph_builder.add_edge("fundamental_research_agent", "aggregator")
 graph_builder.add_edge("technical_research_agent", "aggregator")
@@ -192,8 +192,9 @@ graph_builder.add_edge("macro_research_agent", "aggregator")
 graph_builder.add_edge("industry_research_agent", "aggregator")
 graph_builder.add_edge("headline_research_agent", "aggregator")
 graph_builder.add_edge("aggregator", "evaluator")
+# evaluation-optimization feedback loop with configured iteraation count
 graph_builder.add_conditional_edges(
-    "evaluator", route_sentiment, {"Compliant": END, "Noncompliant": "aggregator"}
+    "evaluator", sentiment_router, {"Compliant": END, "Noncompliant": "aggregator"}
 )
 
 # compile the graph workflow with node caching
@@ -218,7 +219,7 @@ def input(input_dict: dict) -> EquityResearchState:
         combined_sentiment="",
         compliant=False,
         feedback=None,
-        aggregation_retry_count=0,
+        revision_iteration_count=0,
     )
     return state
 
