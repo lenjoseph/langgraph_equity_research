@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 
 
+from agents.evaluation.agent import evaluate_aggregated_sentement
 from agents.headline.agent import get_headline_sentiment
 from agents.industry.agent import get_industry_sentiment
 from agents.aggregation.agent import get_aggregated_sentiment
@@ -13,7 +14,7 @@ from models.state import EquityResearchState
 from agents.fundamentals.agent import get_fundamental_sentiment
 from agents.macro.agent import get_macro_sentiment
 from agents.technical.agent import get_technical_sentiment
-from util import create_cache_policy, validate_ticker
+from util import create_cache_policy, draw_architecture, validate_ticker
 
 load_dotenv()
 logger = get_logger(__name__)
@@ -97,6 +98,27 @@ def sentiment_aggregator(state: EquityResearchState) -> dict:
     return {"combined_sentiment": combined_sentiment}
 
 
+def sentiment_evaluator(state: EquityResearchState) -> dict:
+    """LLM call to evaluate sentiment aggregator output"""
+    logger.info("starting sentiment evaluation")
+    sentiment_evaluation = evaluate_aggregated_sentement(
+        sentiment=state.combined_sentiment
+    )
+    logger.info("Completed sentiment evaluation")
+    sentiment_evaluation["aggregation_retry_count"] = state.aggregation_retry_count + 1
+    return sentiment_evaluation
+
+
+def route_sentiment(state: EquityResearchState):
+    "Route back to aggregator or terminate based on evaluator feedback"
+    if state.compliant == True:
+        return "Compliant"
+    elif state.aggregation_retry_count > 2:
+        return "Compliant"
+    else:
+        return "Noncompliant"
+
+
 # build workflow
 graph_builder = StateGraph(EquityResearchState)
 
@@ -110,12 +132,14 @@ graph_builder.add_node(
     # todo: get smart about dynamic cache eviction; set ttl based on last earnings release for ticker
     cache_policy=create_cache_policy(ttl=3600),
 )
+
 graph_builder.add_node(
     "technical_research_agent",
     technical_research_agent,
     # evict technical research cache after 5 minutes
     cache_policy=create_cache_policy(ttl=300),
 )
+
 graph_builder.add_node(
     "macro_research_agent",
     macro_research_agent,
@@ -123,6 +147,7 @@ graph_builder.add_node(
     # todo: get smart about dynamic cache eviction; set ttl based on last fed report issuance
     cache_policy=create_cache_policy(ttl=3600, static_key="macro_research"),
 )
+
 graph_builder.add_node(
     "industry_research_agent",
     industry_research_agent,
@@ -136,10 +161,13 @@ graph_builder.add_node(
     # evict headline research cache after one hour
     cache_policy=create_cache_policy(ttl=3600),
 )
+
 graph_builder.add_node(
     "aggregator",
     sentiment_aggregator,
 )
+
+graph_builder.add_node("evaluator", sentiment_evaluator)
 
 # call research agents in parallel when ticker validation passes, otherwise end
 
@@ -163,9 +191,10 @@ graph_builder.add_edge("technical_research_agent", "aggregator")
 graph_builder.add_edge("macro_research_agent", "aggregator")
 graph_builder.add_edge("industry_research_agent", "aggregator")
 graph_builder.add_edge("headline_research_agent", "aggregator")
-
-# terminate graph
-graph_builder.add_edge("aggregator", END)
+graph_builder.add_edge("aggregator", "evaluator")
+graph_builder.add_conditional_edges(
+    "evaluator", route_sentiment, {"Compliant": END, "Noncompliant": "aggregator"}
+)
 
 # compile the graph workflow with node caching
 cache = InMemoryCache()
@@ -174,15 +203,7 @@ graph_workflow = graph_builder.compile(cache=cache)
 
 # uncomment to regenerate architectural diagram
 
-# try:
-#     png_data = graph_workflow.get_graph().draw_mermaid_png()
-#     with open("architecture.png", "wb") as f:
-#         f.write(png_data)
-# except Exception as e:
-#     print(f"Error generating architecture.png: {e}")
-#     # Fallback to writing mermaid text
-#     with open("architecture.mmd", "w") as f:
-#         f.write(graph_workflow.get_graph().draw_mermaid())
+# draw_architecture(graph_workflow)
 
 
 def input(input_dict: dict) -> EquityResearchState:
@@ -195,6 +216,9 @@ def input(input_dict: dict) -> EquityResearchState:
         industry_sentiment="",
         headline_sentiment="",
         combined_sentiment="",
+        compliant=False,
+        feedback=None,
+        aggregation_retry_count=0,
     )
     return state
 
