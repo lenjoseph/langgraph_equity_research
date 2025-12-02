@@ -38,7 +38,12 @@ def validate_ticker(ticker: str, state: EquityResearchState) -> dict:
         # A valid ticker should have at least some basic info like symbol or regularMarketPrice
         is_ticker = bool("longName" in info and info["longName"] is not None)
 
-        return {"is_ticker_valid": is_ticker}
+        if is_ticker:
+            industry = info.get("industry")
+            business = info.get("longName")
+            return {"is_ticker_valid": True, "industry": industry, "business": business}
+        else:
+            return {"is_ticker_valid": False}
     except:
         return {"is_ticker_valid": False}
 

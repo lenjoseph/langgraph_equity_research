@@ -9,7 +9,7 @@ from agents.shared.llm_models import LLM_MODELS
 dotenv.load_dotenv()
 
 
-def get_headline_sentiment(ticker: str):
+def get_headline_sentiment(business: str):
     """
     Get headline sentiment using Google's built-in search grounding.
     Google Search is configured via model_kwargs as it's a native Gemini feature.
@@ -19,7 +19,7 @@ def get_headline_sentiment(ticker: str):
     cutoff_date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
 
     prompt = headline_research_prompt.format(
-        ticker=ticker,
+        business=business,
         current_date=current_date,
         cutoff_date=cutoff_date,
     )

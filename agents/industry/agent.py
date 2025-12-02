@@ -9,17 +9,18 @@ from agents.shared.llm_models import LLM_MODELS
 dotenv.load_dotenv()
 
 
-def get_industry_sentiment(ticker: str):
+def get_industry_sentiment(ticker: str, industry: str):
     """
     Get industry sentiment using Google's built-in search grounding.
     Google Search is configured via model_kwargs as it's a native Gemini feature.
     """
 
     current_date = datetime.now().strftime("%Y-%m-%d")
-    cutoff_date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+    cutoff_date = (datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d")
 
     prompt = industry_research_prompt.format(
         ticker=ticker,
+        industry=industry,
         current_date=current_date,
         cutoff_date=cutoff_date,
     )

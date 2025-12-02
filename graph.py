@@ -74,7 +74,7 @@ def industry_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate technical research sentiment"""
     logger.info(f"Starting industry research for {state.ticker}")
     industry_sentiment = get_industry_sentiment(
-        ticker=state.ticker,
+        ticker=state.ticker, industry=state.industry
     )
     logger.info(f"Completed industry research for {state.ticker}")
     return {"industry_sentiment": industry_sentiment}
@@ -82,11 +82,11 @@ def industry_research_agent(state: EquityResearchState) -> dict:
 
 def headline_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate technical research sentiment"""
-    logger.info(f"Starting headline research for {state.ticker}")
+    logger.info(f"Starting headline research for {state.business}")
     headline_sentiment = get_headline_sentiment(
-        ticker=state.ticker,
+        business=state.business,
     )
-    logger.info(f"Completed headline research for {state.ticker}")
+    logger.info(f"Completed headline research for {state.business}")
     return {"headline_sentiment": headline_sentiment}
 
 
@@ -212,6 +212,8 @@ def input(input_dict: dict) -> EquityResearchState:
         ticker=input_dict["ticker"],
         trade_duration=input_dict["trade_duration"],
         trade_direction=input_dict["trade_direction"],
+        industry="",
+        business="",
         fundamental_sentiment="",
         technical_sentiment="",
         macro_sentiment="",
@@ -220,6 +222,7 @@ def input(input_dict: dict) -> EquityResearchState:
         combined_sentiment="",
         compliant=False,
         feedback=None,
+        is_ticker_valid=False,
         revision_iteration_count=0,
     )
     return state

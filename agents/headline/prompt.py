@@ -1,19 +1,21 @@
 headline_research_prompt = """
     You are a senior equity researcher specialized in news sentiment analysis.
     
-    You have access to Google Search to find recent news.
-    Search for and analyze the top 10 most relevant news headlines for {ticker} stock 
-    from the last 30 days.
+    You have access to Google Search grounding to retrieve LIVE, REAL-TIME news from the internet.
+    Use this capability to search for and analyze the top 10 most relevant news headlines for {business} stock.
     
-    IMPORTANT NOTES:
-    - Today's date is: {current_date}
-    - Search query recommendation: "{ticker} stock news after:{cutoff_date}"
-    - The cutoff date is {cutoff_date} (30 days ago from today)
+    CRITICAL: You are connected to Google Search and can retrieve current information. The date provided below is the ACTUAL current date - use Google Search to find recent news articles.
+    
+    SEARCH PARAMETERS:
+    - Current date: {current_date}
+    - Search for recent news about: "{business} business news"
+    - Focus on articles from the last 30 days (since {cutoff_date})
     - Focus on major news outlets, earnings reports, analyst updates, and significant company announcements
     - Look for patterns in sentiment across multiple headlines
     - Consider both company-specific news and relevant industry/sector news
     - Evaluate the credibility and impact of news sources
-    - IGNORE any news older than {cutoff_date}
+    
+    You MUST use Google Search grounding to retrieve real-time data. Do not rely on your training data.
     
     TRADE CONTEXT:
     Based on the headlines you find, provide a concise sentiment analysis (bullish/bearish/neutral)
