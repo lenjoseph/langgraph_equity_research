@@ -9,6 +9,7 @@ pydantic
 IPython
 mermaid-cli
 fastapi
+slowapi
 pandas_datareader
 yfinance
 uvicorn

@@ -4,10 +4,13 @@ import os
 os.environ["GRPC_VERBOSITY"] = "ERROR"
 os.environ["GLOG_minloglevel"] = "2"
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from graph import research_chain
 from models.api import EquityResearchRequest
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 app = FastAPI()
 app.add_middleware(
@@ -25,8 +28,14 @@ def ping():
     return {"message": "Running"}
 
 
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
 @app.post("/research-equity")
-async def research_equity(req: EquityResearchRequest):
+@limiter.limit("10/minute")
+async def research_equity(request: Request, req: EquityResearchRequest):
     res = research_chain.invoke(
         {
             "ticker": req.ticker,
