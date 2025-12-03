@@ -36,7 +36,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 @app.post("/research-equity")
 @limiter.limit("10/minute")
 async def research_equity(request: Request, req: EquityResearchRequest):
-    res = research_chain.invoke(
+    res = await research_chain.ainvoke(
         {
             "ticker": req.ticker,
             "trade_duration": req.trade_duration,
