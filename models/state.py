@@ -26,6 +26,7 @@ class EquityResearchState(BaseModel):
     technical_sentiment: Optional[str] = None
     macro_sentiment: Optional[str] = None
     industry_sentiment: Optional[str] = None
+    peer_sentiment: Optional[str] = None
     headline_sentiment: Optional[str] = None
     combined_sentiment: Optional[str] = None
     compliant: bool = False

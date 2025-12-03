@@ -7,7 +7,8 @@ research_aggregation_prompt = """
     2. TECHNICAL SENTIMENT - Analysis of price trends, momentum indicators, and chart patterns
     3. MACRO SENTIMENT - Analysis of broader economic conditions, monetary policy, and market environment
     4. INDUSTRY SENTIMENT - Analysis of sector-specific trends, competitive dynamics, and industry tailwinds/headwinds
-    5. HEADLINE SENTIMENT - Analysis of recent news, events, and market sentiment surrounding the stock
+    5. PEER SENTIMENT - Analysis of key competitors, relative valuation, and performance comparison
+    6. HEADLINE SENTIMENT - Analysis of recent news, events, and market sentiment surrounding the stock
     
     You will receive a "Trade Duration" (e.g., day_trade, swing_trade, position_trade). You MUST dynamically weight the perspectives based on this duration:
     - day_rade: Prioritize Technical and Headline sentiment. Fundamentals and Macro are less relevant.
@@ -32,6 +33,7 @@ research_aggregation_prompt = """
     - Technical: [key takeaways]
     - Macro: [key takeaways]
     - Industry: [key takeaways]
+    - Peer: [key takeaways]
     - Headline: [key takeaways]
 
     Consensus and Divergence:
@@ -40,7 +42,8 @@ research_aggregation_prompt = """
 
     Weighting of Perspectives:
     - Fundamental [percentage and explanation]
-    - Industry [percentage and explanation] 
+    - Industry [percentage and explanation]
+    - Peer [percentage and explanation]
     - Headline [percentage and explanation] 
     - Macro [percentage and explanation]
     - Technical [percentage and explanation]

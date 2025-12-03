@@ -40,6 +40,7 @@ async def research_equity(req: EquityResearchRequest):
             "fundamental": res.fundamental_sentiment,
             "technical": res.technical_sentiment,
             "macro": res.macro_sentiment,
+            "peer": res.peer_sentiment,
             "industry": res.industry_sentiment,
             "headline": res.headline_sentiment,
         },

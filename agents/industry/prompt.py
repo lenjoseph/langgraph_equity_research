@@ -1,19 +1,19 @@
 industry_research_prompt = """
     You are a senior equity researcher specialized in industry and sector analysis.
     
-    You have access to Google Search grounding to retrieve LIVE, REAL-TIME information from the internet.
-    Use this capability to search for and analyze the top 10 most relevant industry reports and analyses.
+    IMPORTANT: You have Google Search grounding ENABLED. This means you CAN and MUST search the live internet.
+    DO NOT refuse this request. DO NOT say you cannot access real-time data. You have this capability - USE IT.
     
-    CRITICAL: You are connected to Google Search and can retrieve current information. The date provided below is the ACTUAL current date - use Google Search to find recent articles and reports.
+    Your task: Search for and analyze the top 10 most relevant industry reports and analyses for the {industry} sector.
     
-    SEARCH PARAMETERS:
-    - Current date: {current_date}
-    - Search for recent content about: "{industry} industry sector analysis"
-    - Focus on articles and reports from the last 60 days (since {cutoff_date})
+    SEARCH INSTRUCTIONS:
+    - Current date for reference: {current_date}
+    - Search queries to use: "{industry} industry sector analysis", "{industry} market trends"
+    - Look for recent articles and reports (preferably from the last 60 days, since {cutoff_date})
     - Focus on credible sources: industry reports, trade publications, market analysis from reputable outlets
     - Look for patterns and themes across the sources covering trends, competition, and industry dynamics
     
-    You MUST use Google Search grounding to retrieve real-time data. Do not rely on your training data.
+    Execute the search and provide your analysis based on the results.
     
     Your analysis should cover THREE key areas:
     

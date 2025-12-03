@@ -8,6 +8,7 @@ from fastapi import HTTPException
 from agents.evaluation.agent import evaluate_aggregated_sentement
 from agents.headline.agent import get_headline_sentiment
 from agents.industry.agent import get_industry_sentiment
+from agents.peer.agent import get_peer_sentiment
 from agents.aggregation.agent import get_aggregated_sentiment
 from logger import get_logger
 from models.state import EquityResearchState
@@ -36,6 +37,7 @@ def ticker_router(state: EquityResearchState):
             "technical_research_agent",
             "macro_research_agent",
             "industry_research_agent",
+            "peer_research_agent",
             "headline_research_agent",
         ]
     else:
@@ -78,6 +80,14 @@ def industry_research_agent(state: EquityResearchState) -> dict:
     )
     logger.info(f"Completed industry research for {state.ticker}")
     return {"industry_sentiment": industry_sentiment}
+
+
+def peer_research_agent(state: EquityResearchState) -> dict:
+    """LLM call to generate peer research sentiment"""
+    logger.info(f"Starting peer research for {state.business}")
+    peer_sentiment = get_peer_sentiment(business=state.business)
+    logger.info(f"Completed peer research for {state.business}")
+    return {"peer_sentiment": peer_sentiment}
 
 
 def headline_research_agent(state: EquityResearchState) -> dict:
@@ -158,6 +168,13 @@ graph_builder.add_node(
 )
 
 graph_builder.add_node(
+    "peer_research_agent",
+    peer_research_agent,
+    # evict peer research cache after one hour
+    cache_policy=create_cache_policy(ttl=3600),
+)
+
+graph_builder.add_node(
     "headline_research_agent",
     headline_research_agent,
     # evict headline research cache after one hour
@@ -181,6 +198,7 @@ graph_builder.add_conditional_edges(
         "technical_research_agent",
         "macro_research_agent",
         "industry_research_agent",
+        "peer_research_agent",
         "headline_research_agent",
         END,
     ],
@@ -190,6 +208,7 @@ graph_builder.add_edge("fundamental_research_agent", "aggregator")
 graph_builder.add_edge("technical_research_agent", "aggregator")
 graph_builder.add_edge("macro_research_agent", "aggregator")
 graph_builder.add_edge("industry_research_agent", "aggregator")
+graph_builder.add_edge("peer_research_agent", "aggregator")
 graph_builder.add_edge("headline_research_agent", "aggregator")
 graph_builder.add_edge("aggregator", "evaluator")
 # evaluation-optimization feedback loop with configured iteraation count
@@ -218,6 +237,7 @@ def input(input_dict: dict) -> EquityResearchState:
         technical_sentiment="",
         macro_sentiment="",
         industry_sentiment="",
+        peer_sentiment="",
         headline_sentiment="",
         combined_sentiment="",
         compliant=False,
