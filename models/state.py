@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional
+from typing import Any, Dict, Optional
 from pydantic import BaseModel
 
 
@@ -33,3 +33,4 @@ class EquityResearchState(BaseModel):
     feedback: Optional[str] = None
     is_ticker_valid: bool = False
     revision_iteration_count: int = 0
+    ticker_info: Optional[Dict[str, Any]] = None  # Cached yfinance ticker.info

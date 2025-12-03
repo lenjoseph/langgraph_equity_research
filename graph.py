@@ -49,6 +49,7 @@ def fundamental_research_agent(state: EquityResearchState) -> dict:
     logger.info(f"Starting fundamental research for {state.ticker}")
     fundamental_sentiment = get_fundamental_sentiment(
         ticker=state.ticker,
+        cached_info=state.ticker_info,  # Pass cached yfinance info to avoid duplicate API call
     )
     logger.info(f"Completed fundamental research for {state.ticker}")
     return {"fundamental_sentiment": fundamental_sentiment}
@@ -244,6 +245,7 @@ def input(input_dict: dict) -> EquityResearchState:
         feedback=None,
         is_ticker_valid=False,
         revision_iteration_count=0,
+        ticker_info=None,  # Will be populated by ticker_validation node
     )
     return state
 

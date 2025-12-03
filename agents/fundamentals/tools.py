@@ -123,9 +123,15 @@ def _get_earnings_data(
     return earnings
 
 
-def get_earnings_and_financial_health(ticker: str) -> FundamentalsData:
+def get_earnings_and_financial_health(
+    ticker: str, cached_info: Optional[Dict[str, Any]] = None
+) -> FundamentalsData:
     """
     Get comprehensive earnings and financial health data for a given ticker.
+
+    Args:
+        ticker: Stock ticker symbol
+        cached_info: Optional pre-fetched yfinance ticker.info to avoid duplicate API calls
 
     Returns:
         FundamentalsData: Structured output with earnings, financial statements,
@@ -163,8 +169,8 @@ def get_earnings_and_financial_health(ticker: str) -> FundamentalsData:
             "quarterly": _process_dataframe(cash_flow_quarterly, CASH_FLOW_METRICS, 4),
         }
 
-        # 4. Get Company Info & Ratios
-        info = stock.info
+        # 4. Get Company Info & Ratios - use cached info if available
+        info = cached_info if cached_info is not None else stock.info
 
         ratios = {
             "P/E_ratio": info.get("trailingPE"),
