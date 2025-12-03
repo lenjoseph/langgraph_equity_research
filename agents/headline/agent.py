@@ -1,9 +1,8 @@
 import dotenv
 from datetime import datetime, timedelta
-from langchain_google_genai import ChatGoogleGenerativeAI
 
 from agents.headline.prompt import headline_research_prompt
-from agents.shared.llm_models import LLM_MODELS
+from agents.shared.llm_models import LLM_MODELS, get_google_llm
 
 
 dotenv.load_dotenv()
@@ -23,13 +22,11 @@ def get_headline_sentiment(business: str):
         current_date=current_date,
         cutoff_date=cutoff_date,
     )
-    model = LLM_MODELS["google"]
 
-    # Configure Google Search grounding via model_kwargs
-    llm = ChatGoogleGenerativeAI(
-        model=model,
+    llm = get_google_llm(
+        model=LLM_MODELS["google"],
         temperature=0.0,
-        model_kwargs={"tools": [{"google_search_retrieval": {}}]},
+        with_search_grounding=True,
     )
 
     result = llm.invoke(prompt)

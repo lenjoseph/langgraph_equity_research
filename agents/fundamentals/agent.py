@@ -1,7 +1,6 @@
 from typing import Any, Dict, Optional
 
 import dotenv
-from langchain_openai import ChatOpenAI
 
 from agents.fundamentals.prompt import fundamentals_research_prompt
 from agents.fundamentals.tools import (
@@ -9,7 +8,7 @@ from agents.fundamentals.tools import (
     get_earnings_and_financial_health,
 )
 from agents.shared.agent_utils import run_agent_with_tools
-from agents.shared.llm_models import LLM_MODELS
+from agents.shared.llm_models import LLM_MODELS, get_openai_llm
 
 dotenv.load_dotenv()
 
@@ -24,8 +23,7 @@ def get_fundamental_sentiment(
         ticker: Stock ticker symbol
         cached_info: Optional pre-fetched yfinance ticker.info to avoid duplicate API calls
     """
-    model = LLM_MODELS["open_ai_smart"]
-    llm = ChatOpenAI(model=model, temperature=0.0)
+    llm = get_openai_llm(model=LLM_MODELS["open_ai_smart"], temperature=0.0)
 
     if cached_info is not None:
         # Use cached info - call function directly instead of via tool
