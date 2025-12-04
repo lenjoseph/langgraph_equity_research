@@ -33,6 +33,14 @@ To run the program in Langsmith, which offers observability for graph execution 
 4. Run `langsmith dev` from the root of the project
 5. A browser window should open showing the built graph and execution controls
 
+# Running the Streamlit Demo
+
+To run the interactive demo UI, follow these steps:
+
+1. Start the API server with `python main.py`
+2. In a separate terminal, run `streamlit run demo.py`
+3. Open http://localhost:8501 in your browser
+
 # Architecture
 
 This app implements an agentic ai architecture to compile equity research on a single stock across different analytical lenses.
