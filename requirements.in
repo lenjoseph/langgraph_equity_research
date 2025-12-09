@@ -1,12 +1,11 @@
 langchain
-langchain-core
-langchain-google-genai
-langchain-openai
-langchain-huggingface
-langchain-chroma
-langchain-text-splitters
-sentence-transformers
-langgraph-cli[inmem]
+langchain_core
+langchain_google-genai
+langchain_openai
+langchain_huggingface
+langchain_chroma
+langchain_text-splitters
+langgraph_cli[inmem]
 langgraph
 chromadb
 pytest
@@ -21,4 +20,3 @@ sec-edgar-api
 uvicorn
 numpy<2
 streamlit
-unstructured

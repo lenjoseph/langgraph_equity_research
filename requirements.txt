@@ -4,8 +4,6 @@
 #
 #    pip-compile
 #
-aiofiles==25.1.0
-    # via unstructured-client
 altair==6.0.0
     # via streamlit
 annotated-doc==0.0.4
@@ -26,15 +24,11 @@ attrs==25.4.0
     #   jsonschema
     #   referencing
 backoff==2.2.1
-    # via
-    #   posthog
-    #   unstructured
+    # via posthog
 bcrypt==5.0.0
     # via chromadb
 beautifulsoup4==4.14.2
-    # via
-    #   unstructured
-    #   yfinance
+    # via yfinance
 blinker==1.9.0
     # via streamlit
 blockbuster==1.5.25
@@ -57,9 +51,7 @@ cffi==2.0.0
     #   cryptography
     #   curl-cffi
 charset-normalizer==3.4.4
-    # via
-    #   requests
-    #   unstructured
+    # via requests
 chromadb==1.3.5
     # via
     #   -r requirements.in
@@ -68,8 +60,6 @@ click==8.3.1
     # via
     #   langgraph-cli
     #   mermaid-cli
-    #   nltk
-    #   python-oxmsg
     #   streamlit
     #   typer
     #   uvicorn
@@ -80,13 +70,9 @@ colorama==0.4.6
 coloredlogs==15.0.1
     # via onnxruntime
 cryptography==44.0.3
-    # via
-    #   langgraph-api
-    #   unstructured-client
+    # via langgraph-api
 curl-cffi==0.13.0
     # via yfinance
-dataclasses-json==0.6.7
-    # via unstructured
 decorator==5.2.1
     # via ipython
 deprecated==1.3.1
@@ -97,21 +83,14 @@ distro==1.9.0
     #   posthog
 durationpy==0.10
     # via kubernetes
-emoji==2.15.0
-    # via unstructured
 executing==2.2.1
     # via stack-data
 fastapi==0.121.2
     # via -r requirements.in
 filelock==3.20.0
-    # via
-    #   huggingface-hub
-    #   torch
-    #   transformers
+    # via huggingface-hub
 filetype==1.2.0
-    # via
-    #   langchain-google-genai
-    #   unstructured
+    # via langchain-google-genai
 flatbuffers==25.9.23
     # via onnxruntime
 forbiddenfruit==0.1.4
@@ -119,9 +98,7 @@ forbiddenfruit==0.1.4
 frozendict==2.4.7
     # via yfinance
 fsspec==2025.12.0
-    # via
-    #   huggingface-hub
-    #   torch
+    # via huggingface-hub
 gitdb==4.0.12
     # via gitpython
 gitpython==3.1.45
@@ -162,12 +139,8 @@ h11==0.16.0
     #   uvicorn
 hf-xet==1.2.0
     # via huggingface-hub
-html5lib==1.1
-    # via unstructured
 httpcore==1.0.9
-    # via
-    #   httpx
-    #   unstructured-client
+    # via httpx
 httptools==0.7.1
     # via uvicorn
 httpx==0.28.1
@@ -177,13 +150,10 @@ httpx==0.28.1
     #   langgraph-sdk
     #   langsmith
     #   openai
-    #   unstructured-client
 huggingface-hub==0.36.0
     # via
     #   langchain-huggingface
-    #   sentence-transformers
     #   tokenizers
-    #   transformers
 humanfriendly==10.0
     # via coloredlogs
 idna==3.11
@@ -207,13 +177,8 @@ jinja2==3.1.6
     # via
     #   altair
     #   pydeck
-    #   torch
 jiter==0.12.0
     # via openai
-joblib==1.5.2
-    # via
-    #   nltk
-    #   scikit-learn
 jsonpatch==1.33
     # via langchain-core
 jsonpointer==3.0.0
@@ -253,8 +218,6 @@ langchain-openai==1.0.3
     # via -r requirements.in
 langchain-text-splitters==1.0.0
     # via -r requirements.in
-langdetect==1.0.9
-    # via unstructured
 langgraph==1.0.3
     # via
     #   -r requirements.in
@@ -289,15 +252,11 @@ langsmith==0.4.43
 limits==5.6.0
     # via slowapi
 lxml==6.0.2
-    # via
-    #   pandas-datareader
-    #   unstructured
+    # via pandas-datareader
 markdown-it-py==4.0.0
     # via rich
 markupsafe==3.0.3
     # via jinja2
-marshmallow==3.26.1
-    # via dataclasses-json
 matplotlib-inline==0.2.1
     # via ipython
 mdurl==0.1.2
@@ -310,14 +269,8 @@ mpmath==1.3.0
     # via sympy
 multitasking==0.0.12
     # via yfinance
-mypy-extensions==1.1.0
-    # via typing-inspect
 narwhals==2.13.0
     # via altair
-networkx==3.6
-    # via torch
-nltk==3.9.2
-    # via unstructured
 numpy==1.26.4
     # via
     #   -r requirements.in
@@ -326,18 +279,12 @@ numpy==1.26.4
     #   onnxruntime
     #   pandas
     #   pydeck
-    #   scikit-learn
-    #   scipy
     #   streamlit
-    #   transformers
-    #   unstructured
     #   yfinance
 oauthlib==3.3.1
     # via
     #   kubernetes
     #   requests-oauthlib
-olefile==0.47
-    # via python-oxmsg
 onnxruntime==1.23.2
     # via chromadb
 openai==2.8.0
@@ -389,11 +336,9 @@ packaging==25.0
     #   langchain-core
     #   langsmith
     #   limits
-    #   marshmallow
     #   onnxruntime
     #   pytest
     #   streamlit
-    #   transformers
 pandas==2.3.3
     # via
     #   pandas-datareader
@@ -408,9 +353,7 @@ peewee==3.18.3
 pexpect==4.9.0
     # via ipython
 pillow==12.0.0
-    # via
-    #   sentence-transformers
-    #   streamlit
+    # via streamlit
 platformdirs==4.5.0
     # via yfinance
 playwright==1.56.0
@@ -438,8 +381,6 @@ protobuf==6.33.1
     #   proto-plus
     #   streamlit
     #   yfinance
-psutil==7.1.3
-    # via unstructured
 ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.3
@@ -467,7 +408,6 @@ pydantic==2.12.4
     #   langgraph
     #   langsmith
     #   openai
-    #   unstructured-client
 pydantic-core==2.41.5
     # via pydantic
 pydeck==0.9.1
@@ -482,8 +422,6 @@ pygments==2.19.2
     #   rich
 pyjwt==2.10.1
     # via langgraph-api
-pypdf==6.4.1
-    # via unstructured-client
 pypika==0.48.9
     # via chromadb
 pyproject-hooks==1.2.0
@@ -501,12 +439,6 @@ python-dotenv==1.2.1
     # via
     #   langgraph-cli
     #   uvicorn
-python-iso639==2025.11.16
-    # via unstructured
-python-magic==0.4.27
-    # via unstructured
-python-oxmsg==0.0.2
-    # via unstructured
 pytz==2025.2
     # via
     #   pandas
@@ -517,19 +449,13 @@ pyyaml==6.0.3
     #   huggingface-hub
     #   kubernetes
     #   langchain-core
-    #   transformers
     #   uvicorn
-rapidfuzz==3.14.3
-    # via unstructured
 referencing==0.37.0
     # via
     #   jsonschema
     #   jsonschema-specifications
 regex==2025.11.3
-    # via
-    #   nltk
-    #   tiktoken
-    #   transformers
+    # via tiktoken
 requests==2.32.5
     # via
     #   google-api-core
@@ -544,15 +470,11 @@ requests==2.32.5
     #   sec-edgar-api
     #   streamlit
     #   tiktoken
-    #   transformers
-    #   unstructured
     #   yfinance
 requests-oauthlib==2.0.0
     # via kubernetes
 requests-toolbelt==1.0.0
-    # via
-    #   langsmith
-    #   unstructured-client
+    # via langsmith
 rich==14.2.0
     # via
     #   chromadb
@@ -563,25 +485,13 @@ rpds-py==0.30.0
     #   referencing
 rsa==4.9.1
     # via google-auth
-safetensors==0.7.0
-    # via transformers
-scikit-learn==1.7.2
-    # via sentence-transformers
-scipy==1.16.3
-    # via
-    #   scikit-learn
-    #   sentence-transformers
 sec-edgar-api==1.1.0
-    # via -r requirements.in
-sentence-transformers==5.1.2
     # via -r requirements.in
 shellingham==1.5.4
     # via typer
 six==1.17.0
     # via
-    #   html5lib
     #   kubernetes
-    #   langdetect
     #   posthog
     #   python-dateutil
 slowapi==0.1.9
@@ -613,45 +523,32 @@ structlog==25.5.0
     #   langgraph-api
     #   langgraph-runtime-inmem
 sympy==1.14.0
-    # via
-    #   onnxruntime
-    #   torch
+    # via onnxruntime
 tenacity==9.1.2
     # via
     #   chromadb
     #   langchain-core
     #   langgraph-api
     #   streamlit
-threadpoolctl==3.6.0
-    # via scikit-learn
 tiktoken==0.12.0
     # via langchain-openai
 tokenizers==0.22.1
     # via
     #   chromadb
     #   langchain-huggingface
-    #   transformers
 toml==0.10.2
     # via streamlit
-torch==2.2.2
-    # via sentence-transformers
 tornado==6.5.2
     # via streamlit
 tqdm==4.67.1
     # via
     #   chromadb
     #   huggingface-hub
-    #   nltk
     #   openai
-    #   sentence-transformers
-    #   transformers
-    #   unstructured
 traitlets==5.14.3
     # via
     #   ipython
     #   matplotlib-inline
-transformers==4.57.3
-    # via sentence-transformers
 truststore==0.10.4
     # via langgraph-api
 typer==0.20.0
@@ -676,26 +573,15 @@ typing-extensions==4.15.0
     #   pydantic
     #   pydantic-core
     #   pyee
-    #   python-oxmsg
     #   referencing
-    #   sentence-transformers
     #   starlette
     #   streamlit
-    #   torch
     #   typer
-    #   typing-inspect
     #   typing-inspection
-    #   unstructured
-typing-inspect==0.9.0
-    # via dataclasses-json
 typing-inspection==0.4.2
     # via pydantic
 tzdata==2025.2
     # via pandas
-unstructured==0.18.21
-    # via -r requirements.in
-unstructured-client==0.42.4
-    # via unstructured
 urllib3==2.5.0
     # via
     #   kubernetes
@@ -714,8 +600,6 @@ watchfiles==1.1.1
     #   uvicorn
 wcwidth==0.2.14
     # via prompt-toolkit
-webencodings==0.5.1
-    # via html5lib
 websocket-client==1.9.0
     # via kubernetes
 websockets==15.0.1
@@ -723,9 +607,7 @@ websockets==15.0.1
     #   uvicorn
     #   yfinance
 wrapt==2.0.1
-    # via
-    #   deprecated
-    #   unstructured
+    # via deprecated
 xxhash==3.6.0
     # via langgraph
 yfinance==0.2.66
