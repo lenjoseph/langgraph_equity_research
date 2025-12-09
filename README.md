@@ -71,6 +71,8 @@ An evaluator agent reviews the aggregator's output and determines whether it com
 
 The application tracks detailed metrics for each agent execution and aggregates them at the request level. This enables cost monitoring, performance debugging, and cache effectiveness analysis.
 
+![Observability Metrics](/metrics.png)
+
 **Per-Agent Metrics:**
 
 - `latency_ms` - Execution time in milliseconds

@@ -45,7 +45,6 @@ def ensure_filings_ingested(ticker: str, years: int = 2) -> bool:
 
     logger.info(f"Ingesting filings for {ticker}...")
     result = ingest_ticker_filings(ticker, years=years)
-    logger.info(f"Ingestion complete: {result}")
     return True
 
 
