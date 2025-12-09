@@ -59,24 +59,19 @@ def filings_ingestion(state: EquityResearchState) -> dict:
 
 
 def ticker_router(state: EquityResearchState):
-    """Route to filings ingestion if ticker is valid, otherwise end"""
+    """Route to filings ingestion and research agents if ticker is valid, otherwise end"""
     if state.is_ticker_valid:
-        return "filings_ingestion"
+        return [
+            "filings_ingestion",
+            "fundamental_research_agent",
+            "technical_research_agent",
+            "macro_research_agent",
+            "industry_research_agent",
+            "peer_research_agent",
+            "headline_research_agent",
+        ]
     else:
         return END
-
-
-def filings_ingestion_router(state: EquityResearchState):
-    """Route to all research agents in parallel after filings ingestion"""
-    return [
-        "fundamental_research_agent",
-        "technical_research_agent",
-        "macro_research_agent",
-        "industry_research_agent",
-        "peer_research_agent",
-        "headline_research_agent",
-        "filings_research_agent",
-    ]
 
 
 def fundamental_research_agent(state: EquityResearchState) -> dict:
@@ -361,22 +356,19 @@ graph_builder.add_edge(START, "ticker_validation")
 graph_builder.add_conditional_edges(
     "ticker_validation",
     ticker_router,
-    ["filings_ingestion", END],
-)
-# ingest SEC filings before research agents run, then fan out to all agents
-graph_builder.add_conditional_edges(
-    "filings_ingestion",
-    filings_ingestion_router,
     [
+        "filings_ingestion",
         "fundamental_research_agent",
         "technical_research_agent",
         "macro_research_agent",
         "industry_research_agent",
         "peer_research_agent",
         "headline_research_agent",
-        "filings_research_agent",
+        END,
     ],
 )
+# ingest SEC filings before filings research agent runs
+graph_builder.add_edge("filings_ingestion", "filings_research_agent")
 # synthesize sentiment
 graph_builder.add_edge("fundamental_research_agent", "aggregator")
 graph_builder.add_edge("technical_research_agent", "aggregator")
