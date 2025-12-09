@@ -189,3 +189,6 @@ if st.session_state.results:
 
         with st.expander("Headline Analysis", expanded=True):
             st.markdown(sentiment_data.get("headline", "Not available"))
+
+        with st.expander("SEC Filings Analysis", expanded=True):
+            st.markdown(sentiment_data.get("filings", "Not available"))

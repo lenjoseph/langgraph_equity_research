@@ -9,6 +9,7 @@ research_aggregation_prompt = """
     4. INDUSTRY SENTIMENT - Analysis of sector-specific trends, competitive dynamics, and industry tailwinds/headwinds
     5. PEER SENTIMENT - Analysis of key competitors, relative valuation, and performance comparison
     6. HEADLINE SENTIMENT - Analysis of recent news, events, and market sentiment surrounding the stock
+    7. SEC FILING SENTIMENT - Analysis of recent SEC filings related to the stock
     
     You will receive a "Trade Duration" (e.g., day_trade, swing_trade, position_trade). You MUST dynamically weight the perspectives based on this duration:
     - day_rade: Prioritize Technical and Headline sentiment. Fundamentals and Macro are less relevant.
@@ -35,6 +36,7 @@ research_aggregation_prompt = """
     - Industry: [key takeaways]
     - Peer: [key takeaways]
     - Headline: [key takeaways]
+    - SEC Filings: [key takeaways]
 
     Consensus and Divergence:
     - Consensus: [content]  
@@ -47,6 +49,7 @@ research_aggregation_prompt = """
     - Headline [percentage and explanation] 
     - Macro [percentage and explanation]
     - Technical [percentage and explanation]
+    - SEC Filings [percentage and explanation]
     
     **Overall Sentiment:** [BULLISH/BEARISH/NEUTRAL]
     

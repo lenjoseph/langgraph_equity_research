@@ -166,3 +166,30 @@ class FilingChunk(BaseModel):
     filing_date: str
     accession_number: str
     chunk_index: int
+
+
+class FilingCitation(BaseModel):
+    """Citation from an SEC filing."""
+
+    quote: str = Field(description="Direct quote or paraphrase from the filing")
+    filing_type: str = Field(description="Type of filing (10-K, 10-Q, 8-K)")
+    section: str = Field(description="Section of the filing (e.g., risk_factors, mda)")
+    filing_date: str = Field(description="Date of the filing (YYYY-MM-DD)")
+
+
+class FilingsSentimentOutput(BaseModel):
+    """Structured output for SEC filings sentiment analysis."""
+
+    sentiment: Sentiment = Field(
+        description="Overall sentiment: BULLISH, BEARISH, or NEUTRAL"
+    )
+    key_findings: List[str] = Field(
+        description="List of 3-5 key findings from the filings"
+    )
+    citations: List[FilingCitation] = Field(
+        description="Citations supporting the key findings"
+    )
+    risk_factors_summary: str = Field(
+        description="Summary of material risk factors identified"
+    )
+    confidence: Confidence = Field(description="Confidence level: High, Medium, or Low")

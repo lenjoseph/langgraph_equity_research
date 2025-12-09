@@ -13,6 +13,7 @@ sentiment_evaluator_prompt = """
     - Macro: [key takeaways]
     - Industry: [key takeaways]
     - Headline: [key takeaways]
+    - SEC Filings: [key takeaways]
 
     Consensus and Divergence:
     - Consensus: [content]  
@@ -24,6 +25,7 @@ sentiment_evaluator_prompt = """
     - Headline [percentage and explanation] 
     - Macro [percentage and explanation]
     - Technical [percentage and explanation]
+    - SEC Filings: [key takeaways]
     
     **Overall Sentiment:** [BULLISH/BEARISH/NEUTRAL]
     

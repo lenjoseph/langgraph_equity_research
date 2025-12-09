@@ -6,6 +6,7 @@ from fastapi import HTTPException
 
 
 from agents.evaluation.agent import evaluate_aggregated_sentement
+from agents.filings.agent import get_filings_sentiment
 from agents.headline.agent import get_headline_sentiment
 from agents.industry.agent import get_industry_sentiment
 from agents.peer.agent import get_peer_sentiment
@@ -47,6 +48,7 @@ def ticker_router(state: EquityResearchState):
             "industry_research_agent",
             "peer_research_agent",
             "headline_research_agent",
+            "filings_research_agent",
         ]
     else:
         return END
@@ -144,6 +146,23 @@ def headline_research_agent(state: EquityResearchState) -> dict:
         )
         return {
             "headline_sentiment": "Analysis unavailable due to data retrieval error."
+        }
+
+
+def filings_research_agent(state: EquityResearchState) -> dict:
+    """LLM call to generate SEC filings research sentiment"""
+    logger.info(f"Starting filings research for {state.ticker}")
+    try:
+        filings_sentiment = get_filings_sentiment(ticker=state.ticker)
+        if filings_sentiment:
+            logger.info(f"Completed filings research for {state.ticker}")
+            return {"filings_sentiment": format_sentiment_output(filings_sentiment)}
+        else:
+            return {"filings_sentiment": "No SEC filings available for analysis."}
+    except Exception as e:
+        logger.error(f"Filings research failed for {state.ticker}: {e}", exc_info=True)
+        return {
+            "filings_sentiment": "Analysis unavailable due to data retrieval error."
         }
 
 
@@ -247,6 +266,13 @@ graph_builder.add_node(
 )
 
 graph_builder.add_node(
+    "filings_research_agent",
+    filings_research_agent,
+    # evict filings research cache after one day
+    cache_policy=create_cache_policy(ttl=86400),
+)
+
+graph_builder.add_node(
     "aggregator",
     sentiment_aggregator,
 )
@@ -265,6 +291,7 @@ graph_builder.add_conditional_edges(
         "industry_research_agent",
         "peer_research_agent",
         "headline_research_agent",
+        "filings_research_agent",
         END,
     ],
 )
@@ -275,6 +302,7 @@ graph_builder.add_edge("macro_research_agent", "aggregator")
 graph_builder.add_edge("industry_research_agent", "aggregator")
 graph_builder.add_edge("peer_research_agent", "aggregator")
 graph_builder.add_edge("headline_research_agent", "aggregator")
+graph_builder.add_edge("filings_research_agent", "aggregator")
 graph_builder.add_edge("aggregator", "evaluator")
 # evaluation-optimization feedback loop with configured iteraation count
 graph_builder.add_conditional_edges(
@@ -304,6 +332,7 @@ def input(input_dict: dict) -> EquityResearchState:
         industry_sentiment="",
         peer_sentiment="",
         headline_sentiment="",
+        filings_sentiment="",
         combined_sentiment="",
         compliant=False,
         feedback=None,

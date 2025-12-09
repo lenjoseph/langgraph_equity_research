@@ -208,3 +208,9 @@ __marimo__/
 
 # langgraph
 .langgraph_api
+
+# RAG cache data (preserve directories with .gitkeep)
+data/filings/*
+!data/filings/.gitkeep
+data/chroma/*
+!data/chroma/.gitkeep
