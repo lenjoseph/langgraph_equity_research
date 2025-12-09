@@ -1,6 +1,6 @@
-# Langgraph Equity Research
+# Langgraph Equity Research with RAG
 
-Agentic equity research implemented on LangGraph, yfinance, and FastAPI
+Agentic equity research implemented on LangGraph, ChromaDB, yfinance, and FastAPI
 
 # Running in Docker
 
@@ -47,7 +47,7 @@ This app implements an agentic ai architecture to compile equity research on a s
 
 ![Architecture Diagram](/architecture.png)
 
-The app structures ai agents as research domain specialists that perform data gathering and analysis scoped to their respective domain.
+The app structures ai agents as research domain specialists that perform data gathering and analysis scoped to their respective domain. The filing agent implements a RAG architecture to analyze relevant SEC filings.
 The app manages state through langgraph's graph state model.
 The graph implements a node-based cache that configures cache keys and ttl at the agent level.
 The entrypoint of the graph vaidates that the ticker is valid using yfinance.
@@ -65,6 +65,7 @@ An evaluator agent reviews the aggregator's output and determines whether it com
 - LLM Models: OpenAI, Google Gemini
 - Financial Data API: YFinance
 - Economic Data API: Pandas Datareader
+- SEC Filings RAG: ChromaDB, SentenceTransformer
 
 # API Definition
 
@@ -79,8 +80,9 @@ This endpoint requires three params:
 
 1. Technical Researcher - Focuses on technical price data over fixed timeframes
 2. Fundamentals Researcher - Focuses on business fundamentals via most recent earnings results
-3. Macro Economic Researcher - Focuses on the macro economic components provided by federal reserve data
-4. Industry Researcher - Focuses on forecasted headwinds / tailwinds relative to the industry of the stock
-5. Headline Researcher - Focuses on recent (within the last month) headlines about the stock
-6. Sentiment Aggregator - Compiles overall stock sentiment based on aggregate findings of research specialist agents
-7. Sentiment Evaluator - Evaluates the aggregated sentiment for compliance with target criteria
+3. Filings Researcher - Analyzes SEC filings (10-K, 10-Q) using RAG over embedded filing excerpts
+4. Macro Economic Researcher - Focuses on the macro economic components provided by federal reserve data
+5. Industry Researcher - Focuses on forecasted headwinds / tailwinds relative to the industry of the stock
+6. Headline Researcher - Focuses on recent (within the last month) headlines about the stock
+7. Sentiment Aggregator - Compiles overall stock sentiment based on aggregate findings of research specialist agents
+8. Sentiment Evaluator - Evaluates the aggregated sentiment for compliance with target criteria
