@@ -24,7 +24,7 @@ def get_peer_sentiment(business: str) -> Tuple[PeerSentimentOutput, AgentMetrics
         Tuple of (PeerSentimentOutput, AgentMetrics)
     """
     start_time = time.perf_counter()
-    model = LLM_MODELS["google"]
+    model = LLM_MODELS["google_fast"]
 
     current_date = datetime.now().strftime("%Y-%m-%d")
     cutoff_date = (datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d")

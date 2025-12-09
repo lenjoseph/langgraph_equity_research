@@ -15,9 +15,15 @@ dotenv.load_dotenv()
 AGENT_NAME = "aggregation"
 
 
-def get_aggregated_sentiment(state: EquityResearchState) -> Tuple[str, AgentMetrics]:
+def get_aggregated_sentiment(
+    state: EquityResearchState, iteration: int = 1
+) -> Tuple[str, AgentMetrics]:
     """
     Aggregate sentiment from all research agents.
+
+    Args:
+        state: The current equity research state
+        iteration: The iteration number (1-based) for the aggregation loop
 
     Returns:
         Tuple of (aggregated sentiment string, AgentMetrics)
@@ -44,8 +50,10 @@ def get_aggregated_sentiment(state: EquityResearchState) -> Tuple[str, AgentMetr
     result, token_usage = run_agent_with_tools(llm, prompt, track_tokens=True)
 
     latency_ms = (time.perf_counter() - start_time) * 1000
+    # Include iteration in agent name for tracking multiple loops
+    agent_name = f"{AGENT_NAME}_{iteration}" if iteration > 1 else AGENT_NAME
     metrics = AgentMetrics(
-        agent_name=AGENT_NAME,
+        agent_name=agent_name,
         latency_ms=latency_ms,
         token_usage=token_usage,
         model=model,

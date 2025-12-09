@@ -16,9 +16,14 @@ AGENT_NAME = "evaluation"
 
 def evaluate_aggregated_sentement(
     sentiment: str,
+    iteration: int = 1,
 ) -> Tuple[Dict[str, Any], AgentMetrics]:
     """
     Evaluate aggregated sentiment for compliance.
+
+    Args:
+        sentiment: The aggregated sentiment to evaluate
+        iteration: The iteration number (1-based) for the evaluation loop
 
     Returns:
         Tuple of (evaluation dict with compliant and feedback, AgentMetrics)
@@ -37,8 +42,10 @@ def evaluate_aggregated_sentement(
     result, token_usage = invoke_llm_with_metrics(base_llm, prompt, AggregatorFeedback)
 
     latency_ms = (time.perf_counter() - start_time) * 1000
+    # Include iteration in agent name for tracking multiple loops
+    agent_name = f"{AGENT_NAME}_{iteration}" if iteration > 1 else AGENT_NAME
     metrics = AgentMetrics(
-        agent_name=AGENT_NAME,
+        agent_name=agent_name,
         latency_ms=latency_ms,
         token_usage=token_usage,
         model=model,

@@ -27,7 +27,7 @@ def get_industry_sentiment(
         Tuple of (IndustrySentimentOutput, AgentMetrics)
     """
     start_time = time.perf_counter()
-    model = LLM_MODELS["google"]
+    model = LLM_MODELS["google_fast"]
 
     current_date = datetime.now().strftime("%Y-%m-%d")
     cutoff_date = (datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d")
