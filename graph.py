@@ -64,7 +64,7 @@ def fundamental_research_agent(state: EquityResearchState) -> dict:
             cached_info=state.ticker_info,  # Pass cached yfinance info to avoid duplicate API call
         )
         logger.info(f"Completed fundamental research for {state.ticker}")
-        metrics = state.metrics.model_copy(deep=True)
+        metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
         return {
             "fundamental_sentiment": format_sentiment_output(fundamental_sentiment),
@@ -87,7 +87,7 @@ def technical_research_agent(state: EquityResearchState) -> dict:
             ticker=state.ticker,
         )
         logger.info(f"Completed technical research for {state.ticker}")
-        metrics = state.metrics.model_copy(deep=True)
+        metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
         return {
             "technical_sentiment": format_sentiment_output(technical_sentiment),
@@ -108,7 +108,7 @@ def macro_research_agent(state: EquityResearchState) -> dict:
     try:
         macro_sentiment, agent_metrics = get_macro_sentiment()
         logger.info("Completed macro research")
-        metrics = state.metrics.model_copy(deep=True)
+        metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
         return {
             "macro_sentiment": format_sentiment_output(macro_sentiment),
@@ -127,7 +127,7 @@ def industry_research_agent(state: EquityResearchState) -> dict:
             ticker=state.ticker, industry=state.industry
         )
         logger.info(f"Completed industry research for {state.ticker}")
-        metrics = state.metrics.model_copy(deep=True)
+        metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
         return {
             "industry_sentiment": format_sentiment_output(industry_sentiment),
@@ -146,7 +146,7 @@ def peer_research_agent(state: EquityResearchState) -> dict:
     try:
         peer_sentiment, agent_metrics = get_peer_sentiment(business=state.business)
         logger.info(f"Completed peer research for {state.business}")
-        metrics = state.metrics.model_copy(deep=True)
+        metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
         return {
             "peer_sentiment": format_sentiment_output(peer_sentiment),
@@ -165,7 +165,7 @@ def headline_research_agent(state: EquityResearchState) -> dict:
             business=state.business,
         )
         logger.info(f"Completed headline research for {state.business}")
-        metrics = state.metrics.model_copy(deep=True)
+        metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
         return {
             "headline_sentiment": format_sentiment_output(headline_sentiment),
@@ -185,7 +185,7 @@ def filings_research_agent(state: EquityResearchState) -> dict:
     logger.info(f"Starting filings research for {state.ticker}")
     try:
         filings_sentiment, agent_metrics = get_filings_sentiment(ticker=state.ticker)
-        metrics = state.metrics.model_copy(deep=True)
+        metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
         if filings_sentiment:
             logger.info(f"Completed filings research for {state.ticker}")
@@ -207,12 +207,16 @@ def filings_research_agent(state: EquityResearchState) -> dict:
 
 def sentiment_aggregator(state: EquityResearchState) -> dict:
     """LLM call to aggregate research findings and synthesize sentiment"""
-    logger.info(f"Starting sentiment aggregation for {state.ticker}")
+    iteration = state.revision_iteration_count + 1
+    logger.info(
+        f"Starting sentiment aggregation for {state.ticker} (iteration {iteration})"
+    )
     try:
-        combined_sentiment, agent_metrics = get_aggregated_sentiment(state)
-        logger.info(f"Completed sentiment aggregation for {state.ticker}")
-        # Update metrics in state
-        metrics = state.metrics.model_copy(deep=True)
+        combined_sentiment, agent_metrics = get_aggregated_sentiment(state, iteration)
+        logger.info(
+            f"Completed sentiment aggregation for {state.ticker} (iteration {iteration})"
+        )
+        metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
         return {
             "combined_sentiment": combined_sentiment,
@@ -232,18 +236,17 @@ def sentiment_aggregator(state: EquityResearchState) -> dict:
 
 def sentiment_evaluator(state: EquityResearchState) -> dict:
     """LLM call to evaluate sentiment aggregator output"""
-    logger.info("Starting sentiment evaluation")
+    iteration = state.revision_iteration_count + 1
+    logger.info(f"Starting sentiment evaluation (iteration {iteration})")
     try:
         sentiment_evaluation, agent_metrics = evaluate_aggregated_sentement(
-            sentiment=state.combined_sentiment
+            sentiment=state.combined_sentiment,
+            iteration=iteration,
         )
-        logger.info("Completed sentiment evaluation")
-        # Update metrics in state
-        metrics = state.metrics.model_copy(deep=True)
+        logger.info(f"Completed sentiment evaluation (iteration {iteration})")
+        metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
-        sentiment_evaluation["revision_iteration_count"] = (
-            state.revision_iteration_count + 1
-        )
+        sentiment_evaluation["revision_iteration_count"] = iteration
         sentiment_evaluation["metrics"] = metrics
         return sentiment_evaluation
     except Exception as e:
