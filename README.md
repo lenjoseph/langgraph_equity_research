@@ -13,7 +13,7 @@ To create a local docker container to run the application, follow these steps (A
 2. Ensure the local Docker daemon is running
 3. Run `docker compose up` from root of the project (note: built image is ~2.6GB)
 4. In a separate terminal, execute the following curl command:
-   curl -X POST "http://localhost:8000/research-equity" -H "Content-Type: application/json" -d '{"ticker": "TICKER", "trade_duration": "position_trade", "trade_direction": "short"}'
+   curl -X POST "http://localhost:8000/research-equity" -H "Content-Type: application/json" -d '{"ticker": "PLTR", "trade_duration": "position_trade", "trade_direction": "short"}'
 
 # Running Locally
 
@@ -25,7 +25,7 @@ To run the program from the terminal, follow these steps:
 4. Run `python scripts/warmup_embeddings.py` to download and cache the embedding model for the RAG agent locally. You only need to do this once, unless you choose to use a different embedding model.
 5. Run `python main.py` from the root of the project
 6. From a separate terminal window, execute the following curl command:
-   curl -X POST "http://localhost:8000/research-equity" -H "Content-Type: application/json" -d '{"ticker": "TICKER", "trade_duration": "position_trade", "trade_direction": "short"}'
+   curl -X POST "http://localhost:8000/research-equity" -H "Content-Type: application/json" -d '{"ticker": "PLTR", "trade_duration": "position_trade", "trade_direction": "short"}'
 
 # Running in LangSmith for Observability
 
@@ -57,9 +57,9 @@ The app structures AI agents as research domain specialists that perform data ga
 - **Vector RAG**: For analyzing dense SEC filings (Filings Agent)
 - **Web RAG**: For real-time internet research (Headline, Industry, Peer Agents)
 - **Tool-Use**: For fetching structured API data (Fundamental, Technical, Macro Agents)
-  The app manages state through langgraph's graph state model.
+- **Application State & Caching**: The app manages state through langgraph's graph state model.
   The graph implements node-level caching with configurable TTLs and dynamic cache policies per agent.
-  The entrypoint of the graph validates that the ticker is valid using yfinance.
+- **Graph Execution**: The entrypoint of the graph validates that the ticker is valid using yfinance.
   Once validated, the graph fans out to start SEC filings ingestion and parallel execution of most research agents (fundamental, technical, macro, industry, peer, headline).
   The filings research agent waits for SEC filings ingestion to complete before execution.
   When all agents have completed, an aggregator agent synthesizes overall sentiment for the stock.
