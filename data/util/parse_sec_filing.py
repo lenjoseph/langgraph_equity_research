@@ -4,7 +4,7 @@ import re
 from typing import Optional
 from bs4 import BeautifulSoup
 
-from logger import get_logger
+from util.logger import get_logger
 
 logger = get_logger(__name__)
 

@@ -12,21 +12,23 @@ from agents.industry.agent import get_industry_sentiment
 from agents.peer.agent import get_peer_sentiment
 from agents.aggregation.agent import get_aggregated_sentiment
 from data.util.ingest_sec_filings import ensure_filings_ingested
-from logger import get_logger
+
 from models.metrics import RequestMetrics
 from models.state import EquityResearchState
 from agents.fundamentals.agent import get_fundamental_sentiment
 from agents.macro.agent import get_macro_sentiment
 from agents.technical.agent import get_technical_sentiment
-from util import (
+
+from util.valiation import validate_ticker
+from util.diagrams import draw_architecture
+from util.cache import (
     create_cache_policy,
     create_fundamentals_cache_policy,
-    create_technical_cache_policy,
     create_macro_cache_policy,
-    draw_architecture,
-    format_sentiment_output,
-    validate_ticker,
+    create_technical_cache_policy,
 )
+from util.formating import format_sentiment_output
+from util.logger import get_logger
 
 load_dotenv()
 logger = get_logger(__name__)

@@ -14,7 +14,7 @@ from data.util.vector_store import (
     collection_exists,
 )
 from data.util.embed_chunks import embed_chunks
-from logger import get_logger
+from util.logger import get_logger
 from models.agent import FilingMetadata
 
 logger = get_logger(__name__)

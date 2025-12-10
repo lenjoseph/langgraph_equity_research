@@ -8,7 +8,7 @@ from typing import Optional
 import requests
 from sec_edgar_api import EdgarClient
 
-from logger import get_logger
+from util.logger import get_logger
 from models.agent import FilingMetadata
 
 logger = get_logger(__name__)

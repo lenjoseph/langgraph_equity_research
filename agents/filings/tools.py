@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from pydantic_core.core_schema import arguments_schema
 
 from data.util.vector_store import get_or_create_collection, collection_exists
-from logger import get_logger
+from util.logger import get_logger
 
 logger = get_logger(__name__)
 

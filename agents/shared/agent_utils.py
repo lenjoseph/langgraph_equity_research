@@ -3,7 +3,7 @@ from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel
 
-from logger import get_logger
+from util.logger import get_logger
 from models.metrics import TokenUsage
 
 logger = get_logger(__name__)

@@ -11,7 +11,7 @@ from agents.shared.llm_models import LLM_MODELS, get_openai_llm
 from agents.shared.agent_utils import invoke_llm_with_metrics
 from data.util.ingest_sec_filings import ingest_ticker_filings
 from data.util.vector_store import collection_exists, get_collection_stats
-from logger import get_logger
+from util.logger import get_logger
 from models.agent import FilingsSentimentOutput
 from models.metrics import AgentMetrics, TokenUsage
 

@@ -45,7 +45,7 @@ To run the interactive demo UI, follow these steps:
 
 This app implements an agentic ai architecture to compile equity research on a single stock across different analytical lenses.
 
-![Architecture Diagram](/architecture.png)
+![Architecture Diagram](/assets/architecture.png)
 
 The app structures AI agents as research domain specialists that perform data gathering and analysis scoped to their respective domain. Agents utilize different architectural patterns:
 
@@ -76,7 +76,7 @@ The app structures AI agents as research domain specialists that perform data ga
 
 The application tracks detailed metrics for each agent execution and aggregates them at the request level. This enables cost monitoring, performance debugging, and cache effectiveness analysis.
 
-![Observability Metrics](/metrics.png)
+![Observability Metrics](/assets/metrics.png)
 
 **Per-Agent Metrics:**
 

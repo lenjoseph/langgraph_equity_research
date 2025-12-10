@@ -2,7 +2,7 @@
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from logger import get_logger
+from util.logger import get_logger
 from models.agent import FilingChunk, FilingMetadata
 
 logger = get_logger(__name__)
