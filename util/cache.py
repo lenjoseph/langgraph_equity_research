@@ -123,6 +123,32 @@ def create_cache_policy(ttl: int, static_key: str | None = None) -> CachePolicy:
     return CachePolicy(key_func=key_func, ttl=ttl)
 
 
+def create_filings_cache_policy(ttl: int = 3600) -> CachePolicy:
+    """
+    Create a cache policy for filings that includes trade parameters in the key.
+
+    Args:
+        ttl: Time to live in seconds
+
+    Returns:
+        CachePolicy instance with ticker, duration, and direction in key
+    """
+
+    def key_func(x):
+        if isinstance(x, dict):
+            ticker = x.get("ticker", "default")
+            duration = x.get("trade_duration", "default")
+            direction = x.get("trade_direction", "default")
+        else:
+            ticker = x.ticker
+            duration = x.trade_duration
+            direction = x.trade_direction
+
+        return f"{ticker}-{duration}-{direction}".encode()
+
+    return CachePolicy(key_func=key_func, ttl=ttl)
+
+
 def create_fundamentals_cache_policy() -> CachePolicy:
     """
     Create a cache policy for fundamentals that adapts TTL based on earnings proximity.

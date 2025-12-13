@@ -2,7 +2,7 @@
 
 Agentic equity research implemented on LangGraph, ChromaDB, yfinance, and FastAPI
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lenjoseph/langgraph_equity_research)
+[![DeepWiki Docs](https://deepwiki.com/badge.svg)](https://deepwiki.com/lenjoseph/langgraph_equity_research)
 
 # Running in Docker
 

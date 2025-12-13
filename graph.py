@@ -21,6 +21,7 @@ from util.valiation import validate_ticker
 from util.diagrams import draw_architecture
 from util.cache import (
     create_cache_policy,
+    create_filings_cache_policy,
     create_fundamentals_cache_policy,
     create_macro_cache_policy,
     create_technical_cache_policy,
@@ -265,7 +266,11 @@ graph_builder = StateGraph(EquityResearchState)
 graph_builder.add_node("ticker_validation", ticker_validation)
 
 # Add the compiled subgraph as a node
-graph_builder.add_node("filings_workflow", run_filings_subgraph)
+graph_builder.add_node(
+    "filings_workflow",
+    run_filings_subgraph,
+    cache_policy=create_filings_cache_policy(ttl=3600),
+)
 
 graph_builder.add_node(
     "fundamental_research_agent",
