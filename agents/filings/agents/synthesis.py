@@ -3,7 +3,7 @@
 import time
 from typing import Optional, Tuple
 
-from agents.filings.prompt import filings_research_prompt
+from agents.filings.prompts.synthesis_prompt import filings_synthesis_prompt
 from agents.shared.llm_models import LLM_MODELS, get_openai_llm
 from agents.shared.agent_utils import invoke_llm_with_metrics
 from util.logger import get_logger
@@ -44,7 +44,7 @@ def generate_filings_sentiment(
         )
         return None, metrics
 
-    prompt = f"{filings_research_prompt}\n\n{context}"
+    prompt = f"{filings_synthesis_prompt}\n\n{context}"
 
     # Get LLM and generate structured output
     llm = get_openai_llm(model=model, temperature=0.1)

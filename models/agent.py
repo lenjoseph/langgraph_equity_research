@@ -193,3 +193,11 @@ class FilingsSentimentOutput(BaseModel):
         description="Summary of material risk factors identified"
     )
     confidence: Confidence = Field(description="Confidence level: High, Medium, or Low")
+
+
+class QueryBuilderOutput(BaseModel):
+    """Structured output for query builder agent."""
+
+    search_queries: List[str] = Field(
+        description="List of 5 search queries optimized for SEC filings retrieval"
+    )

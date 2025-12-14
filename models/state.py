@@ -40,6 +40,9 @@ class EquityResearchState(BaseModel):
     filings_ingested: bool = (
         False  # Whether SEC filings have been ingested to vector store
     )
+    filings_search_queries: Optional[list[str]] = (
+        None  # Dynamically generated search queries for SEC filings
+    )
     filings_context: Optional[str] = None  # Retrieved context from SEC filings
     metrics: Annotated[RequestMetrics, merge_metrics] = Field(
         default_factory=RequestMetrics

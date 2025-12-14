@@ -1,7 +1,7 @@
 """SEC Filings retrieval agent."""
 
 import time
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 from agents.filings.tools import search_filings, FilingSearchResult
 from data.util.vector_store import collection_exists, get_collection_stats
@@ -12,8 +12,8 @@ logger = get_logger(__name__)
 
 AGENT_NAME = "filings_retrieval"
 
-# Key topics to search for comprehensive analysis
-SEARCH_TOPICS = [
+
+DEFAULT_SEARCH_TOPICS = [
     "risk factors material risks",
     "revenue growth trends performance",
     "competitive landscape market position",
@@ -23,22 +23,26 @@ SEARCH_TOPICS = [
 
 
 def _gather_filing_context(
-    ticker: str, top_k_per_topic: int = 3
+    ticker: str,
+    search_queries: Optional[List[str]] = None,
+    top_k_per_topic: int = 3,
 ) -> list[FilingSearchResult]:
     """
     Search filings for multiple topics to gather comprehensive context.
 
     Args:
         ticker: Stock ticker symbol
+        search_queries: List of search queries to use (uses defaults if None)
         top_k_per_topic: Number of results per search topic
 
     Returns:
         Deduplicated list of search results
     """
+    topics = search_queries if search_queries else DEFAULT_SEARCH_TOPICS
     all_results = []
     seen_texts = set()
 
-    for topic in SEARCH_TOPICS:
+    for topic in topics:
         results = search_filings(
             ticker=ticker,
             query=topic,
@@ -59,12 +63,14 @@ def _gather_filing_context(
 
 def get_filings_context(
     ticker: str,
+    search_queries: Optional[List[str]] = None,
 ) -> Tuple[Optional[str], AgentMetrics]:
     """
     Retrieve and format context from SEC filings for a ticker.
 
     Args:
         ticker: Stock ticker symbol
+        search_queries: Optional list of search queries (uses defaults if None)
 
     Returns:
         Tuple of (Formatted context string or None, AgentMetrics)
@@ -99,7 +105,7 @@ def get_filings_context(
         )
         return None, metrics
 
-    filing_results = _gather_filing_context(ticker)
+    filing_results = _gather_filing_context(ticker, search_queries)
 
     if not filing_results:
         logger.warning(f"No relevant filing excerpts found for {ticker}")
