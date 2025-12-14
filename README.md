@@ -63,7 +63,7 @@ The app structures AI agents as research domain specialists that perform data ga
   The graph implements node-level caching with configurable TTLs and dynamic cache policies per agent.
 - **Graph Execution**: The entrypoint of the graph validates that the ticker is valid using yfinance.
   Once validated, the graph fans out to start SEC filings ingestion and parallel execution of most research agents (fundamental, technical, macro, industry, peer, headline).
-  The filings research agent waits for SEC filings ingestion to complete before execution.
+  The filings research workflow waits for SEC filings ingestion to complete before executing retrieval and synthesis steps.
   When all agents have completed, an aggregator agent synthesizes overall sentiment for the stock.
   An evaluator agent reviews the aggregator's output for compliance. If non-compliant, it provides feedback and the aggregator revises (up to 3 iterations).
 
@@ -118,7 +118,8 @@ This system employs a multi-agent architecture where specialized agents use diff
 
 Uses a local ChromaDB vector store to index and semantically search dense documents.
 
-- **Filings Agent**: Ingests SEC filings (10-K, 10-Q) into a vector database. It embeds user queries to retrieve relevant text chunks for analysis.
+- **Filings Retriever**: Searches the vector database for relevant SEC filing text chunks based on key topics (Risk, Growth, etc.).
+- **Filings Synthesis Agent**: Analyzes the retrieved context to generate a sentiment summary.
 
 ### 2. Web RAG Agents (Search Grounding)
 
