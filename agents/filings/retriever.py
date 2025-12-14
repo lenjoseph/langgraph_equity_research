@@ -1,25 +1,16 @@
-"""SEC Filings research agent."""
+"""SEC Filings retrieval agent."""
 
 import time
 from typing import Optional, Tuple
 
-import dotenv
-
-from agents.filings.prompt import filings_research_prompt
 from agents.filings.tools import search_filings, FilingSearchResult
-from agents.shared.llm_models import LLM_MODELS, get_openai_llm
-from agents.shared.agent_utils import invoke_llm_with_metrics
-from data.util.ingest_sec_filings import ingest_ticker_filings
 from data.util.vector_store import collection_exists, get_collection_stats
 from util.logger import get_logger
-from models.agent import FilingsSentimentOutput
 from models.metrics import AgentMetrics, TokenUsage
-
-dotenv.load_dotenv()
 
 logger = get_logger(__name__)
 
-AGENT_NAME = "filings"
+AGENT_NAME = "filings_retrieval"
 
 # Key topics to search for comprehensive analysis
 SEARCH_TOPICS = [
@@ -66,20 +57,22 @@ def _gather_filing_context(
     return all_results[:15]  # Limit total context
 
 
-def get_filings_sentiment(
+def get_filings_context(
     ticker: str,
-) -> Tuple[Optional[FilingsSentimentOutput], AgentMetrics]:
+) -> Tuple[Optional[str], AgentMetrics]:
     """
-    Generate sentiment analysis from SEC filings for a ticker.
+    Retrieve and format context from SEC filings for a ticker.
 
     Args:
         ticker: Stock ticker symbol
 
     Returns:
-        Tuple of (FilingsSentimentOutput or None, AgentMetrics)
+        Tuple of (Formatted context string or None, AgentMetrics)
     """
     start_time = time.perf_counter()
-    model = LLM_MODELS["open_ai_smart"]
+    # Retrieval uses embedding model implicitly via search_filings,
+    # but we track time against a placeholder or the embedding model if we had access to its usage.
+    model = "retrieval"
     token_usage = TokenUsage()
 
     # Check if we have any filings
@@ -127,30 +120,11 @@ def get_filings_sentiment(
         )
     context = "".join(context_parts)
 
-    prompt = f"{filings_research_prompt}\n\n{context}"
-
-    # Get LLM and generate structured output
-    llm = get_openai_llm(model=model, temperature=0.1)
-
-    try:
-        result, token_usage = invoke_llm_with_metrics(
-            llm, prompt, FilingsSentimentOutput
-        )
-        latency_ms = (time.perf_counter() - start_time) * 1000
-        metrics = AgentMetrics(
-            agent_name=AGENT_NAME,
-            latency_ms=latency_ms,
-            token_usage=token_usage,
-            model=model,
-        )
-        return result, metrics
-    except Exception as e:
-        logger.error(f"Error generating filings sentiment: {e}", exc_info=True)
-        latency_ms = (time.perf_counter() - start_time) * 1000
-        metrics = AgentMetrics(
-            agent_name=AGENT_NAME,
-            latency_ms=latency_ms,
-            token_usage=token_usage,
-            model=model,
-        )
-        return None, metrics
+    latency_ms = (time.perf_counter() - start_time) * 1000
+    metrics = AgentMetrics(
+        agent_name=AGENT_NAME,
+        latency_ms=latency_ms,
+        token_usage=token_usage,
+        model=model,
+    )
+    return context, metrics

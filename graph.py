@@ -378,6 +378,7 @@ def input(input_dict: dict) -> EquityResearchState:
         peer_sentiment="",
         headline_sentiment="",
         filings_sentiment="",
+        filings_context="",
         combined_sentiment="",
         compliant=False,
         feedback=None,
