@@ -113,6 +113,25 @@ def run_agent_with_tools(
 
         llm_with_tools = llm.bind_tools(tools) if tools else llm
 
+        # Check token budget before initial call
+        if token_budget:
+            try:
+                # Estimate input tokens
+                input_tokens = llm.get_num_tokens(prompt)
+                if not check_token_budget(input_tokens, token_budget):
+                    logger.warning(
+                        f"Token budget would be exceeded by input: {input_tokens}/{token_budget}"
+                    )
+                    error_msg = f"Token budget exceeded by input: {input_tokens}/{token_budget} tokens"
+                    if track_tokens:
+                        # Return empty usage since we didn't run
+                        return error_msg, TokenUsage(
+                            input_tokens=input_tokens, total_tokens=input_tokens
+                        )
+                    return error_msg
+            except Exception as e:
+                logger.warning(f"Could not estimate tokens before call: {e}")
+
         # initial invocation
         response = llm_with_tools.invoke(prompt)
         total_usage = _aggregate_token_usage(
@@ -126,7 +145,9 @@ def run_agent_with_tools(
             )
             # Return what we have so far
             if track_tokens:
-                return response.content if hasattr(response, "content") else str(response), total_usage
+                return (
+                    response.content if hasattr(response, "content") else str(response)
+                ), total_usage
             return response.content if hasattr(response, "content") else str(response)
 
         # Check for tool calls
@@ -236,6 +257,23 @@ def invoke_llm_with_metrics(
     if not check_token_budget(current_usage, token_budget):
         logger.warning(f"Token budget already exceeded: {current_usage}/{token_budget}")
         raise TokenBudgetExceeded(budget=token_budget, used=current_usage)
+
+    # Check if input tokens would exceed budget
+    if token_budget:
+        try:
+            input_tokens = llm.get_num_tokens(prompt)
+            if not check_token_budget(current_usage + input_tokens, token_budget):
+                logger.warning(
+                    f"Token budget would be exceeded by input: {current_usage + input_tokens}/{token_budget}"
+                )
+                raise TokenBudgetExceeded(
+                    budget=token_budget, used=current_usage + input_tokens
+                )
+        except AttributeError:
+            # LLM might not support get_num_tokens
+            pass
+        except Exception as e:
+            logger.warning(f"Could not estimate tokens before call: {e}")
 
     try:
         if output_schema:

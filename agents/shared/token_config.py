@@ -33,44 +33,44 @@ class TokenBudgetConfig(BaseModel):
     # Per-agent configurations
     fundamental: AgentTokenConfig = Field(
         default_factory=lambda: AgentTokenConfig(
-            max_output_tokens=2048,
-            token_budget=8000,
+            max_output_tokens=500,
+            token_budget=5000,
         )
     )
     technical: AgentTokenConfig = Field(
         default_factory=lambda: AgentTokenConfig(
-            max_output_tokens=2048,
-            token_budget=8000,
+            max_output_tokens=500,
+            token_budget=2000,
         )
     )
     macro: AgentTokenConfig = Field(
         default_factory=lambda: AgentTokenConfig(
-            max_output_tokens=2048,
-            token_budget=8000,
+            max_output_tokens=500,
+            token_budget=2500,
         )
     )
     industry: AgentTokenConfig = Field(
         default_factory=lambda: AgentTokenConfig(
-            max_output_tokens=2048,
-            token_budget=8000,
+            max_output_tokens=500,
+            token_budget=2000,
         )
     )
     peer: AgentTokenConfig = Field(
         default_factory=lambda: AgentTokenConfig(
-            max_output_tokens=2048,
-            token_budget=8000,
+            max_output_tokens=500,
+            token_budget=2000,
         )
     )
     headline: AgentTokenConfig = Field(
         default_factory=lambda: AgentTokenConfig(
-            max_output_tokens=2048,
-            token_budget=8000,
+            max_output_tokens=500,
+            token_budget=2000,
         )
     )
     filings_query_builder: AgentTokenConfig = Field(
         default_factory=lambda: AgentTokenConfig(
-            max_output_tokens=512,
-            token_budget=2000,
+            max_output_tokens=2000,
+            token_budget=4500,
         )
     )
     filings_synthesis: AgentTokenConfig = Field(
@@ -81,14 +81,14 @@ class TokenBudgetConfig(BaseModel):
     )
     aggregation: AgentTokenConfig = Field(
         default_factory=lambda: AgentTokenConfig(
-            max_output_tokens=4096,
-            token_budget=20000,
+            max_output_tokens=1000,
+            token_budget=4000,
         )
     )
     evaluation: AgentTokenConfig = Field(
         default_factory=lambda: AgentTokenConfig(
-            max_output_tokens=1024,
-            token_budget=5000,
+            max_output_tokens=700,
+            token_budget=4000,
         )
     )
 

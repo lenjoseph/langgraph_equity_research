@@ -10,6 +10,7 @@ from agents.headline.agent import get_headline_sentiment
 from agents.industry.agent import get_industry_sentiment
 from agents.peer.agent import get_peer_sentiment
 from agents.aggregation.agent import get_aggregated_sentiment
+from agents.shared.token_config import get_token_config
 
 from models.metrics import RequestMetrics
 from models.state import EquityResearchState
@@ -64,9 +65,11 @@ def fundamental_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate fundamental research sentiment"""
     logger.info(f"Starting fundamental research for {state.ticker}")
     try:
+        config = get_token_config(state.token_preset)
         fundamental_sentiment, agent_metrics = get_fundamental_sentiment(
             ticker=state.ticker,
             cached_info=state.ticker_info,  # Pass cached yfinance info to avoid duplicate API call
+            token_config=config.fundamental,
         )
         logger.info(f"Completed fundamental research for {state.ticker}")
         metrics = RequestMetrics()
@@ -88,8 +91,10 @@ def technical_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate technical research sentiment"""
     logger.info(f"Starting technical research for {state.ticker}")
     try:
+        config = get_token_config(state.token_preset)
         technical_sentiment, agent_metrics = get_technical_sentiment(
             ticker=state.ticker,
+            token_config=config.technical,
         )
         logger.info(f"Completed technical research for {state.ticker}")
         metrics = RequestMetrics()
@@ -111,7 +116,8 @@ def macro_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate macro research sentiment"""
     logger.info("Starting macro research")
     try:
-        macro_sentiment, agent_metrics = get_macro_sentiment()
+        config = get_token_config(state.token_preset)
+        macro_sentiment, agent_metrics = get_macro_sentiment(token_config=config.macro)
         logger.info("Completed macro research")
         metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
@@ -128,8 +134,11 @@ def industry_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate industry research sentiment"""
     logger.info(f"Starting industry research for {state.ticker}")
     try:
+        config = get_token_config(state.token_preset)
         industry_sentiment, agent_metrics = get_industry_sentiment(
-            ticker=state.ticker, industry=state.industry
+            ticker=state.ticker,
+            industry=state.industry,
+            token_config=config.industry,
         )
         logger.info(f"Completed industry research for {state.ticker}")
         metrics = RequestMetrics()
@@ -149,7 +158,11 @@ def peer_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate peer research sentiment"""
     logger.info(f"Starting peer research for {state.business}")
     try:
-        peer_sentiment, agent_metrics = get_peer_sentiment(business=state.business)
+        config = get_token_config(state.token_preset)
+        peer_sentiment, agent_metrics = get_peer_sentiment(
+            business=state.business,
+            token_config=config.peer,
+        )
         logger.info(f"Completed peer research for {state.business}")
         metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
@@ -166,8 +179,10 @@ def headline_research_agent(state: EquityResearchState) -> dict:
     """LLM call to generate headline research sentiment"""
     logger.info(f"Starting headline research for {state.business}")
     try:
+        config = get_token_config(state.token_preset)
         headline_sentiment, agent_metrics = get_headline_sentiment(
             business=state.business,
+            token_config=config.headline,
         )
         logger.info(f"Completed headline research for {state.business}")
         metrics = RequestMetrics()
@@ -192,7 +207,12 @@ def sentiment_aggregator(state: EquityResearchState) -> dict:
         f"Starting sentiment aggregation for {state.ticker} (iteration {iteration})"
     )
     try:
-        combined_sentiment, agent_metrics = get_aggregated_sentiment(state, iteration)
+        config = get_token_config(state.token_preset)
+        combined_sentiment, agent_metrics = get_aggregated_sentiment(
+            state,
+            iteration,
+            token_config=config.aggregation,
+        )
         logger.info(
             f"Completed sentiment aggregation for {state.ticker} (iteration {iteration})"
         )
@@ -219,9 +239,11 @@ def sentiment_evaluator(state: EquityResearchState) -> dict:
     iteration = state.revision_iteration_count + 1
     logger.info(f"Starting sentiment evaluation (iteration {iteration})")
     try:
+        config = get_token_config(state.token_preset)
         sentiment_evaluation, agent_metrics = evaluate_aggregated_sentement(
             sentiment=state.combined_sentiment,
             iteration=iteration,
+            token_config=config.evaluation,
         )
         logger.info(f"Completed sentiment evaluation (iteration {iteration})")
         metrics = RequestMetrics()
@@ -369,6 +391,7 @@ def input(input_dict: dict) -> EquityResearchState:
         ticker=input_dict["ticker"],
         trade_duration=input_dict["trade_duration"],
         trade_direction=input_dict["trade_direction"],
+        token_preset=input_dict.get("token_preset", "standard"),
         industry="",
         business="",
         fundamental_sentiment="",

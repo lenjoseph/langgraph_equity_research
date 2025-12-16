@@ -22,6 +22,7 @@ class EquityResearchState(BaseModel):
     ticker: str
     trade_duration: TradeDuration
     trade_direction: TradeDirection
+    token_preset: str = "standard"
     industry: Optional[str] = None
     business: Optional[str] = None
     fundamental_sentiment: Optional[str] = None

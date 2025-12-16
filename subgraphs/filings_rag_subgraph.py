@@ -2,6 +2,7 @@ from langgraph.graph import END, StateGraph, START
 from agents.filings.agents.query_builder import generate_search_queries
 from agents.filings.agents.retriever import get_filings_context
 from agents.filings.agents.synthesis import generate_filings_sentiment
+from agents.shared.token_config import get_token_config
 from data.util.ingest_sec_filings import ensure_filings_ingested
 from models.state import EquityResearchState
 from models.metrics import RequestMetrics
@@ -36,10 +37,12 @@ def filings_rag_query_builder(state: EquityResearchState) -> dict:
         f"({state.trade_direction.value}, {state.trade_duration.value})"
     )
     try:
+        config = get_token_config(state.token_preset)
         search_queries, agent_metrics = generate_search_queries(
             ticker=state.ticker,
             trade_direction=state.trade_direction,
             trade_duration=state.trade_duration,
+            token_config=config.filings_query_builder,
         )
         metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
@@ -80,8 +83,11 @@ def filings_rag_synthesis_agent(state: EquityResearchState) -> dict:
     """LLM call to generate SEC filings research sentiment"""
     logger.info(f"Starting filings synthesis for {state.ticker}")
     try:
+        config = get_token_config(state.token_preset)
         filings_sentiment, agent_metrics = generate_filings_sentiment(
-            ticker=state.ticker, context=state.filings_context
+            ticker=state.ticker,
+            context=state.filings_context,
+            token_config=config.filings_synthesis,
         )
         metrics = RequestMetrics()
         metrics.add_agent_metrics(agent_metrics)
