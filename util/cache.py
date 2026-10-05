@@ -123,6 +123,10 @@ def create_cache_policy(ttl: int, static_key: str | None = None) -> CachePolicy:
     return CachePolicy(key_func=key_func, ttl=ttl)
 
 
+def _cache_part(value) -> str:
+    return value.value if hasattr(value, "value") else str(value)
+
+
 def create_filings_cache_policy(ttl: int = 3600) -> CachePolicy:
     """
     Create a cache policy for filings that includes trade parameters in the key.
@@ -144,7 +148,7 @@ def create_filings_cache_policy(ttl: int = 3600) -> CachePolicy:
             duration = x.trade_duration
             direction = x.trade_direction
 
-        return f"{ticker}-{duration}-{direction}".encode()
+        return f"{ticker}-{_cache_part(duration)}-{_cache_part(direction)}".encode()
 
     return CachePolicy(key_func=key_func, ttl=ttl)
 
@@ -176,18 +180,13 @@ def create_fundamentals_cache_policy() -> CachePolicy:
         earnings_flag = (
             "earnings_imminent" if is_earnings_imminent(ticker_info) else "normal"
         )
-        return f"{ticker}:{earnings_flag}".encode()
+        if earnings_flag == "earnings_imminent":
+            now = datetime.now()
+            bucket = now.strftime("%Y-%m-%d-%H")
+            minute_bucket = now.minute // 5
+            return f"{ticker}:earnings_imminent:{bucket}:{minute_bucket}".encode()
+        return f"{ticker}:normal".encode()
 
-    def ttl_func(x):
-        """Dynamic TTL based on earnings proximity."""
-        if isinstance(x, dict):
-            ticker_info = x.get("ticker_info")
-        else:
-            ticker_info = x.ticker_info
-
-        return get_fundamentals_ttl(ticker_info)
-
-    # Use shorter TTL since we'll dynamically adjust via key changes
     return CachePolicy(key_func=key_func, ttl=TTL_LONG)
 
 
