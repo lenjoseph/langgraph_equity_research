@@ -2,23 +2,31 @@
 
 import os
 import time
-from functools import lru_cache
 from typing import Optional
 
 import requests
 from sec_edgar_api import EdgarClient
 
 from util.logger import get_logger
+from util.retry import call_with_retry
 from models.agent import FilingMetadata
 
 logger = get_logger(__name__)
 
 
-USER_AGENT = os.getenv("SEC_EDGAR_AGENT_KEY")
-if not USER_AGENT:
-    raise ValueError(
-        "SEC_EDGAR_AGENT_KEY environment variable must be set (format: 'youremail@domain.extension')"
-    )
+class MissingSECIdentity(ValueError):
+    """Raised when SEC requests are attempted without the required user agent."""
+
+
+def require_sec_user_agent() -> str:
+    """Return the SEC user agent, or raise if it was not configured."""
+    user_agent = os.getenv("SEC_EDGAR_AGENT_KEY")
+    if not user_agent:
+        raise MissingSECIdentity(
+            "SEC_EDGAR_AGENT_KEY environment variable must be set (format: 'youremail@domain.extension')"
+        )
+    return user_agent
+
 
 # Rate limiting: SEC allows max 10 requests/second
 REQUEST_DELAY = 0.15  # 150ms between requests
@@ -27,7 +35,9 @@ REQUEST_DELAY = 0.15  # 150ms between requests
 TICKER_CIK_URL = "https://www.sec.gov/files/company_tickers.json"
 
 
-@lru_cache(maxsize=1)
+_TICKER_CIK_MAP: Optional[dict[str, str]] = None
+
+
 def _get_ticker_cik_map() -> dict[str, str]:
     """
     Fetch and cache the ticker-to-CIK mapping from SEC.
@@ -35,10 +45,19 @@ def _get_ticker_cik_map() -> dict[str, str]:
     Returns:
         Dict mapping uppercase ticker symbols to CIK strings
     """
+    global _TICKER_CIK_MAP
+    if _TICKER_CIK_MAP:
+        return _TICKER_CIK_MAP
+
+    user_agent = require_sec_user_agent()
     try:
-        headers = {"User-Agent": USER_AGENT}
-        response = requests.get(TICKER_CIK_URL, headers=headers, timeout=30)
-        response.raise_for_status()
+        headers = {"User-Agent": user_agent}
+        def _fetch_map():
+            response = requests.get(TICKER_CIK_URL, headers=headers, timeout=30)
+            response.raise_for_status()
+            return response
+
+        response = call_with_retry(_fetch_map)
         data = response.json()
 
         ticker_map = {}
@@ -49,7 +68,11 @@ def _get_ticker_cik_map() -> dict[str, str]:
                 ticker_map[ticker] = cik
 
         logger.info(f"Loaded {len(ticker_map)} ticker-to-CIK mappings from SEC")
+        if ticker_map:
+            _TICKER_CIK_MAP = ticker_map
         return ticker_map
+    except MissingSECIdentity:
+        raise
     except Exception as e:
         logger.error(f"Failed to fetch ticker-CIK mapping: {e}")
         return {}
@@ -73,7 +96,8 @@ class SECFetcher:
     """Fetches SEC filings from EDGAR."""
 
     def __init__(self):
-        self.client = EdgarClient(user_agent=USER_AGENT)
+        self.user_agent = require_sec_user_agent()
+        self.client = EdgarClient(user_agent=self.user_agent)
         self._last_request_time = 0
 
     def _rate_limit(self):
@@ -158,11 +182,15 @@ class SECFetcher:
         """
         self._rate_limit()
 
-        headers = {"User-Agent": USER_AGENT}
+        headers = {"User-Agent": self.user_agent}
 
         try:
-            response = requests.get(metadata.url, headers=headers, timeout=30)
-            response.raise_for_status()
+            def _download():
+                response = requests.get(metadata.url, headers=headers, timeout=30)
+                response.raise_for_status()
+                return response
+
+            response = call_with_retry(_download)
             return response.text
         except Exception as e:
             logger.error(f"Failed to download filing {metadata.accession_number}: {e}")
@@ -183,10 +211,12 @@ def get_fetcher() -> SECFetcher:
 
 def fetch_filing_list(
     ticker: str,
-    filing_types: list[str] = ["10-K", "10-Q", "8-K"],
+    filing_types: list[str] | None = None,
     limit: int = 10,
 ) -> list[FilingMetadata]:
     """Convenience function to fetch filing list."""
+    if filing_types is None:
+        filing_types = ["10-K", "10-Q", "8-K"]
     return get_fetcher().fetch_filing_list(ticker, filing_types, limit)
 
 
