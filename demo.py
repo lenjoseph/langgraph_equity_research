@@ -288,6 +288,11 @@ if st.session_state.results:
     # Combined Sentiment (main result)
     st.header("Investment Thesis")
     st.markdown(data.get("combined_sentiment", "No sentiment available"))
+    disclaimer = data.get(
+        "disclaimer",
+        "This output is research analysis for informational purposes only and is not investment advice.",
+    )
+    st.caption(disclaimer)
 
     st.divider()
 

@@ -1,6 +1,7 @@
 import os
 import re
 import time
+import asyncio
 import threading
 from contextlib import asynccontextmanager
 
@@ -12,8 +13,9 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from graph import research_chain
-from models.api import EquityResearchRequest
+from graph import execute_research
+from models.api import RESEARCH_DISCLAIMER, EquityResearchRequest
+from agents.shared.token_config import BUDGET_PRESETS
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -24,6 +26,7 @@ from util.logger import get_logger
 logger = get_logger(__name__)
 
 TICKER_PATTERN = re.compile(r"^[A-Z0-9.\-]{1,10}$")
+REQUEST_TIMEOUT_SECONDS = 240
 
 
 def sanitize_ticker(ticker: str) -> str:
@@ -71,9 +74,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+_default_origins = "http://localhost:8501,http://127.0.0.1:8501"
+cors_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", _default_origins).split(",")
+    if origin.strip()
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -96,20 +105,42 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 async def research_equity(request: Request, req: EquityResearchRequest):
     start_time = time.perf_counter()
     sanitized_ticker = sanitize_ticker(req.ticker)
+    if req.token_preset not in BUDGET_PRESETS:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Unknown token preset: {req.token_preset}. "
+                f"Available presets: {sorted(BUDGET_PRESETS)}"
+            ),
+        )
 
-    res = await research_chain.ainvoke(
-        {
-            "ticker": sanitized_ticker,
-            "trade_duration": req.trade_duration,
-            "trade_direction": req.trade_direction,
-        }
-    )
+    try:
+        res = await asyncio.wait_for(
+            execute_research(
+                {
+                    "ticker": sanitized_ticker,
+                    "trade_duration": req.trade_duration,
+                    "trade_direction": req.trade_direction,
+                    "token_preset": req.token_preset,
+                }
+            ),
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(
+            status_code=504,
+            detail="Research request exceeded the 240 second deadline.",
+        )
+
+    if not res.is_ticker_valid:
+        raise HTTPException(status_code=400, detail=f"Ticker {res.ticker} is invalid")
 
     total_latency_ms = (time.perf_counter() - start_time) * 1000
     res.metrics.total_latency_ms = total_latency_ms
 
     return {
         "ticker": res.ticker,
+        "request_id": res.request_id,
         "sentiment_analysis": {
             "fundamental": res.fundamental_sentiment,
             "technical": res.technical_sentiment,
@@ -120,6 +151,10 @@ async def research_equity(request: Request, req: EquityResearchRequest):
             "filings": res.filings_sentiment,
         },
         "combined_sentiment": res.combined_sentiment,
+        "evaluation_status": res.evaluation_status,
+        "faithfulness_score": res.faithfulness_score,
+        "agent_status": res.agent_status,
+        "disclaimer": RESEARCH_DISCLAIMER,
         "metrics": res.metrics.to_response_dict(),
     }
 

@@ -1,5 +1,10 @@
 import logging
+import os
 import sys
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def get_logger(name: str) -> logging.Logger:
@@ -18,22 +23,19 @@ def get_logger(name: str) -> logging.Logger:
     if logger.hasHandlers():
         return logger
 
-    logger.setLevel(logging.INFO)
+    level_name = os.getenv("LOG_LEVEL", "INFO").upper()
+    level = getattr(logging, level_name, logging.INFO)
+    logger.setLevel(level)
 
-    # Create console handler
     handler = logging.StreamHandler(sys.stdout)
-    handler.setLevel(logging.INFO)
+    handler.setLevel(level)
 
-    # Create formatter
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    # Add formatter to handler
     handler.setFormatter(formatter)
-
-    # Add handler to logger
     logger.addHandler(handler)
 
     return logger
