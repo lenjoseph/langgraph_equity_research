@@ -32,6 +32,7 @@ peer_research_prompt = """
     Provide a comprehensive but concise peer analysis in under 250 words.
     Be specific and cite recent data points from your research.
     You MUST include the citation (source and date) of each key point.
+    The source must be the title or URL of a search result. Do not invent publications.
     
     VERY IMPORTANT: ONLY REFERENCE THE RECEIVED RESEARCH TO MAKE YOUR FINAL JUDGEMENTS. DO NOT RELY ON PRECONCEIVED KNOWLEDGE AT ALL.
     

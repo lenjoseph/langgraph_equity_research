@@ -22,6 +22,7 @@ headline_research_prompt = """
     for the stock with 2-3 key supporting points derived from the news. Keep it under 150 words.
     Be specific about which news events or themes are driving your sentiment assessment.
     You MUST include the citation (source and date) of each key point.
+    The source must be the title or URL of a search result. Do not invent publications.
 
     VERY IMPORTANT: ONLY REFERENCE THE RECEIVED RESEARCH TO MAKE YOUR FINAL JUDGEMENTS. DO NOT RELY ON PRECONCEIVED KNOWLEDGE AT ALL.
 

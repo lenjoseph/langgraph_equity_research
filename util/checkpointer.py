@@ -1,8 +1,4 @@
-"""SQLite-backed checkpoint saver compatible with the installed LangGraph checkpoint API.
-
-The PyPI sqlite saver that matches this LangGraph release is not installable without
-changing langgraph-checkpoint, so snapshots of the in-memory saver are stored in SQLite.
-"""
+"""SQLite-backed checkpoint saver compatible with the installed LangGraph checkpoint API."""
 
 import pickle
 import sqlite3

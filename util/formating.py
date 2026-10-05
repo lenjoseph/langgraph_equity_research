@@ -3,6 +3,9 @@ from pydantic import BaseModel
 
 def format_sentiment_output(output: BaseModel) -> str:
     """Format a sentiment output model as readable text."""
+    if not isinstance(output, BaseModel):
+        return "" if output is None else str(output)
+
     lines = []
     data = output.model_dump()
 

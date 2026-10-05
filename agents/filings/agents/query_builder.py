@@ -43,7 +43,6 @@ def generate_search_queries(
     start_time = time.perf_counter()
     config = token_config or DEFAULT_TOKEN_CONFIG.filings_query_builder
     model = LLM_MODELS["open_ai_fast"]
-    token_usage = TokenUsage()
     budget_exceeded = False
 
     prompt = query_builder_prompt.format(
@@ -61,28 +60,29 @@ def generate_search_queries(
     )
 
     try:
-        result, token_usage = invoke_llm_with_metrics(
+        call = invoke_llm_with_metrics(
             llm, prompt, QueryBuilderOutput, token_budget=config.token_budget
         )
 
-        # Check if budget was exceeded
-        if config.token_budget and token_usage.total_tokens > config.token_budget:
+        if config.token_budget and call.usage.total_tokens > config.token_budget:
+            budget_exceeded = True
+        if call.error and "budget" in call.error.lower():
             budget_exceeded = True
 
         latency_ms = (time.perf_counter() - start_time) * 1000
         metrics = AgentMetrics(
             agent_name=AGENT_NAME,
             latency_ms=latency_ms,
-            token_usage=token_usage,
+            token_usage=call.usage,
             model=model,
             budget_exceeded=budget_exceeded,
         )
 
-        if result and result.search_queries:
+        if call.result and call.result.search_queries:
             logger.info(
-                f"Generated {len(result.search_queries)} search queries for {ticker}"
+                f"Generated {len(call.result.search_queries)} search queries for {ticker}"
             )
-            return result.search_queries, metrics
+            return call.result.search_queries, metrics
         else:
             logger.warning(f"No search queries generated for {ticker}, using defaults")
             return _get_default_queries(trade_direction), metrics
@@ -93,7 +93,7 @@ def generate_search_queries(
         metrics = AgentMetrics(
             agent_name=AGENT_NAME,
             latency_ms=latency_ms,
-            token_usage=token_usage,
+            token_usage=TokenUsage(),
             model=model,
             budget_exceeded=budget_exceeded,
         )
