@@ -138,10 +138,14 @@ class AggregatorFeedback(BaseModel):
     """Feedback from the sentiment evaluator."""
 
     compliant: bool = Field(
-        description="Determine if the provided sentiment complies with the output structure"
+        description="True only when the synthesis matches the shared template and stays faithful to the specialist analyses"
     )
     feedback: str = Field(
-        description="If the output is noncompliant, provide feedback on how to address the delta. Otherwise do not include feedback"
+        description="If the output is noncompliant, explain the format or faithfulness gap. Otherwise leave this empty"
+    )
+    faithfulness: int = Field(
+        default=0,
+        description="0 unsupported, 1 partial support, 2 grounded in the specialist analyses",
     )
 
 

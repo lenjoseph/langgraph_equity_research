@@ -3,6 +3,7 @@ from typing import Annotated, Any, Dict, Optional
 from pydantic import BaseModel, Field
 
 from models.metrics import RequestMetrics, merge_metrics
+from models.result import merge_status
 
 
 class TradeDuration(Enum):
@@ -23,6 +24,7 @@ class EquityResearchState(BaseModel):
     trade_duration: TradeDuration
     trade_direction: TradeDirection
     token_preset: str = "standard"
+    request_id: str = ""
     industry: Optional[str] = None
     business: Optional[str] = None
     fundamental_sentiment: Optional[str] = None
@@ -35,6 +37,8 @@ class EquityResearchState(BaseModel):
     combined_sentiment: Optional[str] = None
     compliant: bool = False
     feedback: Optional[str] = None
+    evaluation_status: Optional[str] = None
+    faithfulness_score: Optional[int] = None
     is_ticker_valid: bool = False
     revision_iteration_count: int = 0
     ticker_info: Optional[Dict[str, Any]] = None  # Cached yfinance ticker.info
@@ -48,3 +52,4 @@ class EquityResearchState(BaseModel):
     metrics: Annotated[RequestMetrics, merge_metrics] = Field(
         default_factory=RequestMetrics
     )
+    agent_status: Annotated[dict[str, str], merge_status] = Field(default_factory=dict)
