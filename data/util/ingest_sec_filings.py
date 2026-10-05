@@ -1,6 +1,6 @@
 """Ingestion pipeline for SEC filings."""
 
-import os
+import threading
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
@@ -12,6 +12,7 @@ from data.util.vector_store import (
     get_collection_stats,
     get_or_create_collection,
     collection_exists,
+    record_latest_filing_date,
 )
 from data.util.embed_chunks import embed_chunks
 from util.logger import get_logger
@@ -20,6 +21,20 @@ from models.agent import FilingMetadata
 logger = get_logger(__name__)
 
 FILINGS_CACHE_DIR = Path("data/filings")
+DEFAULT_FILING_TYPES = ["10-K", "10-Q", "8-K"]
+STALE_FILING_DAYS = 92
+EIGHT_K_PER_YEAR = 8
+
+_ingest_locks: dict[str, threading.Lock] = {}
+_ingest_locks_guard = threading.Lock()
+
+
+def _ingest_lock(ticker: str) -> threading.Lock:
+    key = ticker.upper()
+    with _ingest_locks_guard:
+        if key not in _ingest_locks:
+            _ingest_locks[key] = threading.Lock()
+        return _ingest_locks[key]
 
 
 def _get_cache_path(metadata: FilingMetadata) -> Path:
@@ -56,21 +71,42 @@ def _delete_cached_filing(metadata: FilingMetadata) -> None:
             logger.debug(f"Removed empty directory: {ticker_dir}")
 
 
+def warn_if_filings_stale(ticker: str, latest_filing_date: Optional[str]) -> None:
+    """Log when the newest stored filing is older than one quarter."""
+    if not latest_filing_date:
+        return
+    try:
+        filed_on = datetime.strptime(latest_filing_date, "%Y-%m-%d")
+    except ValueError:
+        logger.warning(f"Could not parse latest filing date for {ticker}: {latest_filing_date}")
+        return
+    age_days = (datetime.now() - filed_on).days
+    if age_days > STALE_FILING_DAYS:
+        logger.warning(
+            f"Latest filing for {ticker} is {latest_filing_date}, older than one quarter"
+        )
+
+
+def cap_filings(filings: list[FilingMetadata], years: int) -> list[FilingMetadata]:
+    """Keep periodic reports and a bounded set of the most recent 8-Ks."""
+    periodic = [filing for filing in filings if filing.filing_type in {"10-K", "10-Q"}]
+    current_reports = [filing for filing in filings if filing.filing_type == "8-K"]
+    current_reports.sort(key=lambda filing: filing.filing_date, reverse=True)
+    return periodic + current_reports[: years * EIGHT_K_PER_YEAR]
+
+
 def ensure_filings_ingested(ticker: str, years: int = 2) -> bool:
     """
-    Ensure filings are ingested for a ticker.
+    Refresh filings for a ticker.
 
-    Returns True if ingestion was performed, False if filings already existed.
+    Already-ingested accession numbers are skipped inside ingest_ticker_filings.
+    Returns True when the collection has at least one document afterward.
     """
-    if collection_exists(ticker):
-        stats = get_collection_stats(ticker)
-        if stats.get("document_count", 0) > 0:
-            logger.info(f"Filings already ingested for {ticker}: {stats}")
-            return False
-
-    logger.info(f"Ingesting filings for {ticker}...")
-    result = ingest_ticker_filings(ticker, years=years)
-    return True
+    logger.info(f"Refreshing filings for {ticker}...")
+    ingest_ticker_filings(ticker, years=years)
+    stats = get_collection_stats(ticker)
+    warn_if_filings_stale(ticker, stats.get("latest_filing_date"))
+    return stats.get("document_count", 0) > 0
 
 
 def _get_ingested_accession_numbers(ticker: str) -> set[str]:
@@ -91,7 +127,27 @@ def _get_ingested_accession_numbers(ticker: str) -> set[str]:
 
 def ingest_ticker_filings(
     ticker: str,
-    filing_types: list[str] = ["10-K", "10-Q"],
+    filing_types: list[str] | None = None,
+    years: int = 2,
+    force: bool = False,
+    keep_html: bool = False,
+) -> dict:
+    """Ingest SEC filings for a ticker, skipping accession numbers already stored."""
+    if filing_types is None:
+        filing_types = list(DEFAULT_FILING_TYPES)
+    with _ingest_lock(ticker):
+        return _ingest_ticker_filings(
+            ticker,
+            filing_types=filing_types,
+            years=years,
+            force=force,
+            keep_html=keep_html,
+        )
+
+
+def _ingest_ticker_filings(
+    ticker: str,
+    filing_types: list[str] | None = None,
     years: int = 2,
     force: bool = False,
     keep_html: bool = False,
@@ -115,7 +171,7 @@ def ingest_ticker_filings(
         f"Starting ingestion for {ticker} ({years} years, types: {filing_types})"
     )
 
-    limit = years * 5  # Conservative estimate
+    limit = max(years * 40, 40)
 
     filings = fetch_filing_list(ticker, filing_types=filing_types, limit=limit)
 
@@ -129,6 +185,7 @@ def ingest_ticker_filings(
         for f in filings
         if datetime.strptime(f.filing_date, "%Y-%m-%d") >= cutoff_date
     ]
+    filings = cap_filings(filings, years)
 
     ingested = _get_ingested_accession_numbers(ticker) if not force else set()
 
@@ -178,6 +235,14 @@ def ingest_ticker_filings(
                 f"Error ingesting {filing.accession_number}: {e}", exc_info=True
             )
             stats["errors"] += 1
+
+    collection_stats = get_collection_stats(ticker)
+    latest = collection_stats.get("latest_filing_date")
+    if latest:
+        try:
+            record_latest_filing_date(ticker, latest)
+        except Exception as exc:
+            logger.warning(f"Could not store latest filing date for {ticker}: {exc}")
 
     logger.info(f"Ingestion complete for {ticker}: {stats}")
     return stats

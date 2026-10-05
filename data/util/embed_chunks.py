@@ -1,9 +1,10 @@
 from chromadb import Collection
-from agents.shared.embedding_models import get_embeddings
 from models.agent import FilingChunk
 
 
 def embed_chunks(chunks: list[FilingChunk], collection: Collection) -> None:
+    from agents.shared.embedding_models import get_embeddings
+
     embeddings_model = get_embeddings()
     batch_size = 32
 

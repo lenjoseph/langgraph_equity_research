@@ -8,6 +8,7 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - SEC_EDGAR_AGENT_KEY=${SEC_EDGAR_AGENT_KEY}
       - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
       - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2:-true}
       - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT:-lg_equity_research}
@@ -15,6 +16,8 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     env_file:
       - .env
+    volumes:
+      - ./data:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]

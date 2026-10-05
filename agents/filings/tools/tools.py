@@ -2,7 +2,6 @@ from typing import Optional
 
 from langchain_core.tools import Tool
 from pydantic import BaseModel, Field
-from pydantic_core.core_schema import arguments_schema
 
 from data.util.vector_store import get_or_create_collection, collection_exists
 from util.logger import get_logger
@@ -11,7 +10,7 @@ logger = get_logger(__name__)
 
 
 class FilingSearchInput(BaseModel):
-    ticker: str = Field(descripton="Stock ticker symbol")
+    ticker: str = Field(description="Stock ticker symbol")
     query: str = Field(description="Search query for finding relevant filing content")
     filing_types: list[str] = Field(
         default=["10-K", "10-Q", "8-K"],

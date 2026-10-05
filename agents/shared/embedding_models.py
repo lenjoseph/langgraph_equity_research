@@ -24,3 +24,26 @@ def get_embeddings() -> HuggingFaceEmbeddings:
         # remove vector length bias from similarity search
         encode_kwargs={"normalize_embeddings": True},
     )
+
+
+@lru_cache(maxsize=1)
+def get_chroma_embedding_function():
+    """Chroma query embedder backed by the same model used during ingest."""
+    from chromadb import EmbeddingFunction
+
+    class SharedMiniLMEmbeddingFunction(EmbeddingFunction):
+        def __call__(self, input):
+            return get_embeddings().embed_documents(list(input))
+
+        @staticmethod
+        def name() -> str:
+            return "shared_minilm"
+
+        def get_config(self) -> dict:
+            return {"model": EMBEDDING_MODELS["hf_embed_fast"]}
+
+        @staticmethod
+        def build_from_config(config):
+            return SharedMiniLMEmbeddingFunction()
+
+    return SharedMiniLMEmbeddingFunction()
